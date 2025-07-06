@@ -1,0 +1,2 @@
+# gyumax-gacha
+ギュウMAXポスターガチャページ
