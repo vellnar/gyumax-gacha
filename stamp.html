@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ギュウMAX!! スタンプラリー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #fffbe7;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .poster-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .poster {
+      position: relative;
+      width: 120px;
+      height: 180px;
+      background-size: cover;
+      background-position: center;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .stamp {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('images/stamp.png');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
+
+    .progress-section {
+      margin-top: 30px;
+    }
+
+    .progress-bar-container {
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto;
+      height: 20px;
+      background: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ff9900, #ffcc00);
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+
+    #progress-text {
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    .complete-msg {
+      margin-top: 30px;
+      font-size: 1.3rem;
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>ギュウMAX!! スタンプラリー</h1>
+
+  <div class="poster-grid" id="grid"></div>
+
+  <div class="progress-section">
+    <h2>進捗</h2>
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress"></div>
+    </div>
+    <p id="progress-text"></p>
+  </div>
+
+  <div class="complete-msg" id="bonus"></div>
+
+  <script>
+    const posters = ['A','B','C','D','E','F','G','H','I'];
+    const grid = document.getElementById('grid');
+    let completeCount = 0;
+
+    posters.forEach(id => {
+      const div = document.createElement('div');
+      div.className = 'poster';
+      div.style.backgroundImage = `url(images/poster_${id}.png)`;
+
+      const stamped = localStorage.getItem(`gyumax_${id}`) === 'true';
+
+      if (stamped) {
+        const stamp = document.createElement('div');
+        stamp.className = 'stamp';
+        div.appendChild(stamp);
+        completeCount++;
+      }
+
+      grid.appendChild(div);
+    });
+
+    const progressRate = Math.floor((completeCount / posters.length) * 100);
+    document.getElementById('progress').style.width = `${progressRate}%`;
+    document.getElementById('progress-text').innerText = `${completeCount} / ${posters.length} 達成（${progressRate}%）`;
+
+    if (completeCount === posters.length) {
+      document.getElementById('bonus').innerText = '🎉 全スタンプコンプリート！特別ボーナスGET 🎉';
+    }
+  </script>
+</body>
+</html>

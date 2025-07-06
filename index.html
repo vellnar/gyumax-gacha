@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ギュウMAX!! ガチャ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+    button {
+      font-size: 1.2rem;
+      padding: 15px 30px;
+      background: #f39c12;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 300px;
+    }
+    button:hover {
+      background: #e67e22;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 ギュウMAX!! くじ引き 🎯</h1>
+    <p>1回だけ！ボタンを押して運試し！</p>
+    <button onclick="draw()">ガチャを引く</button>
+  </div>
+
+  <script>
+    function draw() {
+      if (localStorage.getItem('gyumax_drawn')) {
+        window.location.href = localStorage.getItem('gyumax_drawn');
+        return;
+      }
+      const isWin = Math.random() < 0.3;
+      const url = isWin ? 'atari.html' : 'hazure.html';
+      localStorage.setItem('gyumax_drawn', url);
+      window.location.href = url;
+    }
+  </script>
+</body>
+</html>
