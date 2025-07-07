@@ -1,40 +1,67 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>ギュウMAX!! スタンプラリー</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>スタンプラリー進捗</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #fffbe7;
       margin: 0;
-      padding: 20px;
-      text-align: center;
+      padding: 0;
+      background: url("glass_logo.png") no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      color: #cceeff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      backdrop-filter: blur(4px);
     }
 
     h1 {
+      margin-top: 40px;
       font-size: 2rem;
-      margin-bottom: 10px;
+      text-shadow: 0 0 10px #00ffff;
+    }
+
+    .progress-bar {
+      width: 80%;
+      max-width: 600px;
+      height: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 20px auto;
+      box-shadow: 0 0 10px #00ffff66;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00ffff, #0066ff);
+      transition: width 1s ease;
     }
 
     .poster-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
       gap: 16px;
-      margin-top: 20px;
+      padding: 20px;
+      width: 90%;
+      max-width: 720px;
     }
 
     .poster {
       position: relative;
-      width: 120px;
-      height: 180px;
+      width: 100%;
+      padding-bottom: 100%;
       background-size: cover;
       background-position: center;
-      border: 2px solid #ccc;
-      border-radius: 8px;
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 0 10px #00ffff33;
     }
 
     .stamp {
@@ -43,91 +70,44 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: url('images/stamp.png');
+      background: url("stamp.png") center center no-repeat;
       background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      pointer-events: none;
+      animation: pop 0.5s ease;
     }
 
-    .progress-section {
-      margin-top: 30px;
-    }
-
-    .progress-bar-container {
-      width: 90%;
-      max-width: 400px;
-      margin: 0 auto;
-      height: 20px;
-      background: #eee;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #ff9900, #ffcc00);
-      width: 0%;
-      transition: width 0.5s ease-in-out;
-    }
-
-    #progress-text {
-      margin-top: 10px;
-      font-size: 1rem;
-    }
-
-    .complete-msg {
-      margin-top: 30px;
-      font-size: 1.3rem;
-      color: green;
-      font-weight: bold;
+    @keyframes pop {
+      0% { transform: scale(0.2); opacity: 0; }
+      80% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
 <body>
-  <h1>ギュウMAX!! スタンプラリー</h1>
-
-  <div class="poster-grid" id="grid"></div>
-
-  <div class="progress-section">
-    <h2>進捗</h2>
-    <div class="progress-bar-container">
-      <div class="progress-bar" id="progress"></div>
-    </div>
-    <p id="progress-text"></p>
-  </div>
-
-  <div class="complete-msg" id="bonus"></div>
+  <h1>スタンプラリー進捗</h1>
+  <div class="progress-bar"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <div class="poster-grid" id="posterGrid"></div>
 
   <script>
-    const posters = ['A','B','C','D','E','F','G','H','I'];
-    const grid = document.getElementById('grid');
-    let completeCount = 0;
+    const posterList = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+    const grid = document.getElementById("posterGrid");
+    let count = 0;
 
-    posters.forEach(id => {
-      const div = document.createElement('div');
-      div.className = 'poster';
-      div.style.backgroundImage = `url(images/poster_${id}.png)`;
-
-      const stamped = localStorage.getItem(`gyumax_${id}`) === 'true';
-
-      if (stamped) {
-        const stamp = document.createElement('div');
-        stamp.className = 'stamp';
+    posterList.forEach(id => {
+      const used = localStorage.getItem(`gyumax_${id}`);
+      const div = document.createElement("div");
+      div.className = "poster";
+      div.style.backgroundImage = `url('poster_${id}.png')`;
+      if (used) {
+        const stamp = document.createElement("div");
+        stamp.className = "stamp";
         div.appendChild(stamp);
-        completeCount++;
+        count++;
       }
-
       grid.appendChild(div);
     });
 
-    const progressRate = Math.floor((completeCount / posters.length) * 100);
-    document.getElementById('progress').style.width = `${progressRate}%`;
-    document.getElementById('progress-text').innerText = `${completeCount} / ${posters.length} 達成（${progressRate}%）`;
-
-    if (completeCount === posters.length) {
-      document.getElementById('bonus').innerText = '🎉 全スタンプコンプリート！特別ボーナスGET 🎉';
-    }
+    const progress = Math.floor((count / posterList.length) * 100);
+    document.getElementById("progressFill").style.width = progress + "%";
   </script>
 </body>
 </html>
