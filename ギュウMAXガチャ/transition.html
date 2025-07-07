@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>抽選中...</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抽選中...</title>
   <style>
     body {
-      background: #000;
-      color: #fff;
-      font-family: sans-serif;
-      text-align: center;
+      margin: 0;
       padding: 80px 20px;
+      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      transition: all 0.5s ease;
     }
 
     .spinner {
-      border: 12px solid #444;
-      border-top: 12px solid #ffcc00;
-      border-radius: 50%;
       width: 80px;
       height: 80px;
+      border-radius: 50%;
       margin: 40px auto;
       animation: spin 1s linear infinite;
+    }
+
+    .text {
+      font-size: 1.4rem;
+      margin-top: 20px;
     }
 
     @keyframes spin {
@@ -28,40 +31,132 @@
       100% { transform: rotate(360deg); }
     }
 
-    .text {
-      font-size: 1.3rem;
-      margin-top: 20px;
-      animation: blink 1s infinite;
+    /* --- Theme Styles --- */
+
+    .theme-A {
+      background-color: #000;
+      color: gold;
+    }
+    .theme-A .spinner {
+      border: 12px solid #222;
+      border-top: 12px solid gold;
     }
 
-    @keyframes blink {
-      50% { opacity: 0.5; }
+    .theme-B {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    .theme-B .spinner {
+      border: 12px solid #ddd;
+      border-top: 12px solid orange;
+    }
+
+    .theme-C {
+      background-color: #111;
+      color: #eee;
+    }
+    .theme-C .spinner {
+      border: 12px solid #222;
+      border-top: 12px solid #999;
+    }
+
+    .theme-D {
+      background-color: #fff9e6;
+      color: #d60000;
+    }
+    .theme-D .spinner {
+      border: 12px solid #ccc;
+      border-top: 12px solid #00bcd4;
+    }
+
+    .theme-E {
+      background-color: #e0e0e0;
+      color: #555;
+    }
+    .theme-E .spinner {
+      border: 12px solid #aaa;
+      border-top: 12px solid #888;
+    }
+
+    .theme-F {
+      background-color: #1a1a1a;
+      color: #39ff14;
+    }
+    .theme-F .spinner {
+      border: 12px solid #333;
+      border-top: 12px solid #ff00ff;
+    }
+
+    .theme-G {
+      background-color: #f5e3c0;
+      color: #990000;
+    }
+    .theme-G .spinner {
+      border: 12px solid #b5651d;
+      border-top: 12px solid #ff0000;
+    }
+
+    .theme-H {
+      background-color: #000;
+      color: red;
+      animation: glitch-bg 1s infinite;
+    }
+    .theme-H .spinner {
+      border: 12px solid #400000;
+      border-top: 12px solid red;
+    }
+
+    .theme-I {
+      background-color: #000;
+      color: #00ffff;
+      animation: glitch-bg 1s infinite;
+    }
+    .theme-I .spinner {
+      border: 12px solid #002244;
+      border-top: 12px solid #00ffff;
+    }
+
+    @keyframes glitch-bg {
+      0%, 100% { filter: hue-rotate(0deg); }
+      50% { filter: hue-rotate(15deg); }
     }
   </style>
 </head>
 <body>
   <div class="spinner"></div>
-  <div class="text">運命を抽選中...</div>
+  <div class="text" id="loadingText">抽選中...</div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id"); // A〜IのポスターID
+    const id = urlParams.get("id");
 
-    // 進捗記録（localStorageに保存）
+    // UIテーマ切り替え
+    const themeClass = id ? `theme-${id}` : '';
+    document.body.classList.add(themeClass);
+
+    // メッセージ切り替え
+    const loadingText = {
+      A: "ライバルは、全団体。抽選中...",
+      B: "肉を求める本能 抽選中...",
+      C: "それは、ただの串じゃない 抽選中...",
+      D: "ブチアゲろ、牛肉魂！ 抽選中...",
+      E: "もう一度食べたくなる、そんな味。 抽選中...",
+      F: "ネオンの中で炎が踊る… 抽選中...",
+      G: "香ばしさの極みへ… 抽選中...",
+      H: "神々の裁きが下る… 抽選中...",
+      I: "蒼き神の啓示… 抽選中..."
+    };
+    document.getElementById("loadingText").innerText = loadingText[id] || "抽選中...";
+
+    // スタンプ保存
     if (id) {
       localStorage.setItem(`gyumax_${id}`, 'true');
     }
 
-    // 30%の確率で当たりにする
     const isAtari = Math.random() < 0.3;
 
-    // 2秒後に結果ページへジャンプ
     setTimeout(() => {
-      if (isAtari) {
-        window.location.href = "atari.html";
-      } else {
-        window.location.href = "hazure.html";
-      }
+      window.location.href = isAtari ? "atari.html" : "hazure.html";
     }, 2000);
   </script>
 </body>
