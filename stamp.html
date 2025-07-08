@@ -9,29 +9,34 @@
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      background: url("images/glass_logo.png") no-repeat center center fixed;
-      background-size: cover;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    body {
       font-family: 'Segoe UI', sans-serif;
       color: #cceeff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      min-height: 100vh;
       position: relative;
-      overflow-x: hidden;
-    }
-    
-    html, body {
-  overflow: hidden;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
     }
 
+    /* 背景画像を固定するレイヤー */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: url("images/glass_logo.png") no-repeat center center;
+      background-size: cover;
+      z-index: -1;
+    }
 
     /* 脈打つ中心光 */
     body::before {
