@@ -1,132 +1,255 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>ギュウMAX!! スタンプラリー</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>スタンプラリー進捗</title>
   <style>
-    body {
-      font-family: sans-serif;
-      background: #fffbe7;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
+    * {
+      box-sizing: border-box;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
+body {
+  margin: 0;
+  padding: 0;
+  background: url("images/glass_logo.png") no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Segoe UI', sans-serif;
+  color: #cceeff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
 
-    .poster-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 20px;
-    }
+/* 脈打つ中心光 */
+body::before {
+  content: "";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0,255,255,0.15) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: pulseLight 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
 
-    .poster {
-      position: relative;
-      width: 120px;
-      height: 180px;
-      background-size: cover;
-      background-position: center;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      overflow: hidden;
-    }
+/* コンプリート時の光量増加 */
+body.complete::before {
+  animation-duration: 1.5s;
+  background: radial-gradient(circle, rgba(0,255,255,0.35) 0%, transparent 70%);
+  filter: drop-shadow(0 0 10px #00ffffaa);
+}
 
-    .stamp {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('images/stamp.png');
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      pointer-events: none;
-    }
+@keyframes pulseLight {
+  0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
 
-    .progress-section {
-      margin-top: 30px;
-    }
+h1 {
+  margin-top: 40px;
+  font-size: 2rem;
+  text-shadow: 0 0 10px #00ffff;
+  position: relative;
+  z-index: 2;
+}
 
-    .progress-bar-container {
-      width: 90%;
-      max-width: 400px;
-      margin: 0 auto;
-      height: 20px;
-      background: #eee;
-      border-radius: 10px;
-      overflow: hidden;
-    }
+.progress-bar {
+  width: 90%;
+  max-width: 600px;
+  height: 20px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 20px auto;
+  box-shadow: 0 0 10px #00ffff66;
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #ff9900, #ffcc00);
-      width: 0%;
-      transition: width 0.5s ease-in-out;
-    }
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ffff, #0066ff);
+  transition: width 1s ease;
+  animation: glowbar 2s ease-in-out infinite alternate;
+  border-radius: 10px;
+  position: relative;
+  z-index: 2;
+}
 
-    #progress-text {
-      margin-top: 10px;
-      font-size: 1rem;
-    }
+@keyframes glowbar {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.5); }
+}
 
-    .complete-msg {
-      margin-top: 30px;
-      font-size: 1.3rem;
-      color: green;
-      font-weight: bold;
-    }
+.poster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 16px;
+  padding: 20px;
+  width: 95%;
+  max-width: 720px;
+  position: relative;
+  z-index: 2;
+}
+
+.poster {
+  position: relative;
+  width: 100%;
+  padding-bottom: 141.4%; /* A4比率 */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 10px #00ffff33;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+.poster:hover {
+  box-shadow: 0 0 20px #00ffffaa;
+}
+
+.stamp {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("images/stamp.png") center center no-repeat;
+  background-size: contain;
+  animation: pop 0.5s ease;
+  filter: drop-shadow(0 0 4px #00ffff);
+}
+
+@keyframes pop {
+  0% { transform: scale(0.2); opacity: 0; filter: brightness(2); }
+  80% { transform: scale(1.2); opacity: 1; filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+#completeBanner {
+  background: rgba(0, 255, 200, 0.2);
+  border: 2px solid #00ffff;
+  padding: 16px;
+  border-radius: 12px;
+  margin: 20px auto;
+  text-align: center;
+  font-size: 1.3rem;
+  box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff66;
+  text-shadow: 0 0 5px #00ffff;
+  max-width: 90%;
+  animation: glow 2s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff66; }
+  to { box-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff99; }
+}
+
+/* モーダル用 */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 99;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal img {
+  max-height: 90vh;
+  max-width: 90vw;
+  box-shadow: 0 0 20px #00ffff;
+  border-radius: 10px;
+}
+
+/* ガラス片アニメーションキャンバス */
+#glassParticles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+/* スマホ対応強化 */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  .progress-bar {
+    height: 16px;
+  }
+  .poster-grid {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 12px;
+  }
+}
+
   </style>
 </head>
 <body>
-  <h1>ギュウMAX!! スタンプラリー</h1>
+  <h1>スタンプラリー進捗</h1>
+  <div class="progress-bar"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <div class="poster-grid" id="posterGrid"></div>
+  <div id="completeBanner" style="display: none;">🎉 全スタンプコンプリート！スタッフに見せてね 🎉</div>
 
-  <div class="poster-grid" id="grid"></div>
-
-  <div class="progress-section">
-    <h2>進捗</h2>
-    <div class="progress-bar-container">
-      <div class="progress-bar" id="progress"></div>
-    </div>
-    <p id="progress-text"></p>
+  <div class="modal" id="imageModal" onclick="this.style.display='none'">
+    <img id="modalImage" src="" alt="拡大画像" />
   </div>
 
-  <div class="complete-msg" id="bonus"></div>
-
   <script>
-    const posters = ['A','B','C','D','E','F','G','H','I'];
-    const grid = document.getElementById('grid');
-    let completeCount = 0;
+    const posterList = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+    const grid = document.getElementById("posterGrid");
+    let count = 0;
 
-    posters.forEach(id => {
-      const div = document.createElement('div');
-      div.className = 'poster';
-      div.style.backgroundImage = `url(images/poster_${id}.png)`;
-
-      const stamped = localStorage.getItem(`gyumax_${id}`) === 'true';
-
-      if (stamped) {
-        const stamp = document.createElement('div');
-        stamp.className = 'stamp';
+    posterList.forEach(id => {
+      const used = localStorage.getItem(`gyumax_${id}`);
+      const div = document.createElement("div");
+      div.className = "poster";
+      const imgPath = `images/poster_${id}.png`;
+      div.style.backgroundImage = `url('${imgPath}')`;
+      div.onclick = () => {
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImage");
+        modalImg.src = imgPath;
+        modal.style.display = "flex";
+      };
+      if (used) {
+        const stamp = document.createElement("div");
+        stamp.className = "stamp";
         div.appendChild(stamp);
-        completeCount++;
+        count++;
       }
-
       grid.appendChild(div);
     });
 
-    const progressRate = Math.floor((completeCount / posters.length) * 100);
-    document.getElementById('progress').style.width = `${progressRate}%`;
-    document.getElementById('progress-text').innerText = `${completeCount} / ${posters.length} 達成（${progressRate}%）`;
+    const progress = Math.floor((count / posterList.length) * 100);
+    document.getElementById("progressFill").style.width = progress + "%";
 
-    if (completeCount === posters.length) {
-      document.getElementById('bonus').innerText = '🎉 全スタンプコンプリート！特別ボーナスGET 🎉';
+    const allCollected = posterList.every(id => localStorage.getItem(`gyumax_${id}`));
+    if (allCollected) {
+      document.getElementById("completeBanner").style.display = "block";
     }
   </script>
 </body>
