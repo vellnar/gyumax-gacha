@@ -5,27 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>抽選中...</title>
 <style>
+  * {
+    box-sizing: border-box;
+  }
   body {
-    margin: 0; padding: 80px 20px;
+    margin: 0;
+    padding: 80px 20px;
     text-align: center;
     font-family: 'Segoe UI', sans-serif;
     transition: all 0.5s ease;
+    opacity: 0;
+    animation: fadeIn 1.2s ease forwards;
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
   }
   .spinner {
     width: 80px; height: 80px;
     border-radius: 50%;
     margin: 40px auto;
-    animation: spin 1s linear infinite;
-  }
-  .text {
-    font-size: 1.4rem;
-    margin-top: 20px;
+    animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 15px rgba(255,255,255,0.4);
   }
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  .text {
+    font-size: 1.4rem;
+    margin-top: 20px;
+    min-height: 1.5em;
+  }
   /* --- Theme Styles --- */
   .theme-A { background-color: #000; color: gold; }
   .theme-A .spinner {
@@ -80,12 +94,11 @@
 </head>
 <body>
   <div class="spinner"></div>
-  <div class="text" id="loadingText">抽選中...</div>
-
+  <div class="text" id="loadingText"></div>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get("id");
-    const loadingText = {
+    const loadingTextMap = {
       A: "ライバルは、全団体。抽選中...",
       B: "肉を求める本能 抽選中...",
       C: "それは、ただの串じゃない 抽選中...",
@@ -97,21 +110,27 @@
       I: "蒼き神の啓示… 抽選中..."
     };
 
-    if (!id || !loadingText[id]) {
-      document.getElementById("loadingText").innerText = "無効なポスターIDです。";
+    const textEl = document.getElementById("loadingText");
+    function typeText(text, el, delay = 50) {
+      el.textContent = "";
+      [...text].forEach((char, i) => {
+        setTimeout(() => {
+          el.textContent += char;
+        }, i * delay);
+      });
+    }
+
+    if (!id || !loadingTextMap[id]) {
+      textEl.innerText = "無効なポスターIDです。";
     } else {
       document.body.classList.add(`theme-${id}`);
-      document.getElementById("loadingText").innerText = loadingText[id];
-      
-      // スタンプ保存
+      typeText(loadingTextMap[id], textEl);
       localStorage.setItem(`gyumax_${id}`, 'true');
-
-      // 抽選（30%当たり）
       const isAtari = Math.random() < 0.3;
       setTimeout(() => {
         const nextUrl = isAtari ? `atari.html?id=${id}` : `hazure.html?id=${id}`;
         window.location.href = nextUrl;
-      }, 2000);
+      }, 3000);
     }
   </script>
 </body>
