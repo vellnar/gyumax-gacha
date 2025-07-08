@@ -12,30 +12,21 @@
     html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
-      height: 100vh;
+      height: 100%;
     }
 
     body {
+      background: url("images/glass_logo.png") no-repeat center center fixed;
+      background-size: cover;
       font-family: 'Segoe UI', sans-serif;
       color: #cceeff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
+      min-height: 100vh;
       position: relative;
-    }
-
-    /* 背景画像を固定するレイヤー */
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: url("images/glass_logo.png") no-repeat center center;
-      background-size: cover;
-      z-index: -1;
+      overflow-x: hidden;
     }
 
     /* 脈打つ中心光 */
