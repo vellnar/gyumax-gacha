@@ -1,45 +1,483 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>🎯当たり！</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background: #fff9d6;
-      font-family: sans-serif;
-      text-align: center;
-      padding: 40px 20px;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>あたり！</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&family=Kosugi+Maru&display=swap');
 
-    h1 {
-      font-size: 2.2rem;
-      color: #d40000;
-      margin-bottom: 10px;
-    }
+  html, body {
+    margin: 0; padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
 
-    p {
-      font-size: 1.2rem;
-    }
+  /* 共通フェードイン */
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 1.5s forwards;
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
 
-    .btn {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 12px 24px;
-      background-color: #ffcc00;
-      color: #000;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 10px;
-      font-size: 1rem;
-    }
-  </style>
+  /* 文字タイプライター風 */
+  .typing-text {
+    font-size: 2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: .15em solid orange;
+    width: 0;
+    animation: typing 3s steps(30, end) forwards, blinkCaret 0.75s step-end infinite;
+    margin-bottom: 30px;
+  }
+  @keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+  }
+  @keyframes blinkCaret {
+    50% { border-color: transparent }
+  }
+
+  /* スピナー強化 */
+  .spinner {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    margin: 30px auto;
+    animation: spin 1.5s linear infinite;
+    position: relative;
+  }
+  .spinner::before {
+    content: "";
+    position: absolute;
+    top: 10%; left: 10%;
+    width: 80%; height: 80%;
+    border-radius: 50%;
+    border: 12px solid transparent;
+    border-top-color: inherit;
+    animation: spinReverse 2s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg) }
+    100% { transform: rotate(360deg) }
+  }
+  @keyframes spinReverse {
+    0% { transform: rotate(0deg) }
+    100% { transform: rotate(-360deg) }
+  }
+
+  /* --- 各テーマ --- */
+
+  /* A: 高級感ゴールド */
+  .theme-A {
+    background-color: #000;
+    background-image: radial-gradient(circle at center, #ffd70033 0%, transparent 70%);
+    color: gold;
+  }
+  .theme-A .spinner {
+    border: 12px solid #222;
+    border-top-color: gold;
+    box-shadow: 0 0 20px gold;
+  }
+  .theme-A .typing-text {
+    border-right-color: gold;
+  }
+
+  /* B: 水墨画・和風 */
+  .theme-B {
+    background: #f9f4e9 url('https://cdn.jsdelivr.net/gh/junmin-jp/texture@main/washi_paper.jpg') repeat;
+    color: #3a2e1f;
+    font-family: 'Sawarabi Mincho', serif;
+  }
+  .theme-B .spinner {
+    border: 12px solid #9e8f7f;
+    border-top-color: #5c4a33;
+    box-shadow: 0 0 15px #5c4a33;
+  }
+  .theme-B .typing-text {
+    border-right-color: #5c4a33;
+    font-weight: bold;
+    text-shadow:
+      0 0 1px #bbb,
+      0 0 2px #999;
+  }
+  /* 墨のにじみ風アニメーション */
+  .ink-blur {
+    animation: inkBlur 4s ease-in-out infinite alternate;
+  }
+  @keyframes inkBlur {
+    0% { filter: blur(0); opacity: 1 }
+    100% { filter: blur(2px); opacity: 0.7 }
+  }
+
+  /* C: 美術館風 */
+  .theme-C {
+    background: #f0f0f0;
+    color: #333;
+    font-family: 'Kosugi Maru', sans-serif;
+  }
+  .theme-C .spinner {
+    border: 12px solid #ccc;
+    border-top-color: #999;
+    box-shadow: 0 0 12px #99944d44;
+  }
+  .theme-C .typing-text {
+    border-right-color: #999;
+  }
+  /* ふんわりスモーク */
+  .smoke {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(200,200,200,0.15) 10%, transparent 90%);
+    filter: blur(8px);
+    animation: drift 6s ease-in-out infinite alternate;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  @keyframes drift {
+    0% { transform: translateX(-50%) translateY(0) }
+    100% { transform: translateX(-50%) translateY(20px) }
+  }
+
+  /* D: レンガ壁ストリート */
+  .theme-D {
+    background: #2a2a2a url('https://cdn.pixabay.com/photo/2016/11/29/10/07/brick-wall-1868951_1280.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #ef5f5f;
+    font-family: 'Kosugi Maru', sans-serif;
+    text-shadow: 0 0 8px #ef5f5f66;
+  }
+  .theme-D .spinner {
+    border: 12px solid #422a2a;
+    border-top-color: #ef5f5f;
+    box-shadow: 0 0 18px #ef5f5f;
+  }
+  .theme-D .typing-text {
+    border-right-color: #ef5f5f;
+  }
+  /* スプレー風スプラッシュアニメ */
+  .spray-splash {
+    position: absolute;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ef5f5f88 0%, transparent 70%);
+    animation: splashPulse 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes splashPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1) }
+    50% { opacity: 1; transform: scale(1.3) }
+  }
+
+  /* E: 青春MV風 */
+  .theme-E {
+    background: linear-gradient(135deg, #f9e9f7 0%, #d6e8f0 100%);
+    color: #665e7d;
+    font-family: 'Kosugi Maru', sans-serif;
+  }
+  .theme-E .spinner {
+    border: 12px solid #cfc1d9;
+    border-top-color: #665e7d;
+    box-shadow: 0 0 15px #665e7d88;
+  }
+  .theme-E .typing-text {
+    border-right-color: #665e7d;
+  }
+  /* ゆらゆら波紋風 */
+  .ripple {
+    position: absolute;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(204, 204, 255, 0.25);
+    animation: rippleMove 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes rippleMove {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.15); opacity: 0.3; }
+  }
+
+  /* F: ネオン×炎 */
+  .theme-F {
+    background-color: #000;
+    color: #39ff14;
+    font-family: 'Segoe UI', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+  .theme-F .spinner {
+    border: 12px solid #333;
+    border-top-color: #ff00ff;
+    box-shadow: 0 0 30px #ff00ff;
+  }
+  .theme-F .typing-text {
+    border-right-color: #ff00ff;
+  }
+  /* 炎アニメ (簡易) */
+  .flame {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    width: 80px;
+    height: 140px;
+    background: radial-gradient(circle at 50% 100%, #ff4500 0%, transparent 80%);
+    filter: blur(10px);
+    animation: flameFlicker 1.8s infinite alternate;
+    transform: translateX(-50%);
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  @keyframes flameFlicker {
+    0%, 100% { transform: translateX(-50%) translateY(0) scaleY(1); opacity: 1; }
+    50% { transform: translateX(-50%) translateY(-5px) scaleY(1.1); opacity: 0.8; }
+  }
+
+  /* G: 香ばしさ・煙 */
+  .theme-G {
+    background: #f5e3c0;
+    color: #990000;
+    font-family: 'Sawarabi Mincho', serif;
+    position: relative;
+    overflow: hidden;
+  }
+  .theme-G .spinner {
+    border: 12px solid #b5651d;
+    border-top-color: #ff0000;
+    box-shadow: 0 0 15px #ff0000aa;
+  }
+  .theme-G .typing-text {
+    border-right-color: #990000;
+  }
+  /* 軽い煙パーティクル */
+  .smoke-particles {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    width: 200px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(150,100,50,0.15) 20%, transparent 80%);
+    filter: blur(6px);
+    animation: smokeDrift 5s ease-in-out infinite alternate;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  @keyframes smokeDrift {
+    0%, 100% { transform: translateX(-50%) translateY(0) }
+    50% { transform: translateX(-50%) translateY(25px) }
+  }
+
+  /* H: 黒背景×赤グリッチ */
+  .theme-H {
+    background-color: #000;
+    color: red;
+    font-family: 'Kosugi Maru', sans-serif;
+    animation: glitch-bg 1s infinite;
+    position: relative;
+  }
+  .theme-H .spinner {
+    border: 12px solid #400000;
+    border-top-color: red;
+    box-shadow: 0 0 20px red;
+  }
+  .theme-H .typing-text {
+    border-right-color: red;
+  }
+  @keyframes glitch-bg {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(15deg); }
+  }
+
+  /* I: 黒背景×蒼い雷 */
+  .theme-I {
+    background-color: #000;
+    color: #00ffff;
+    font-family: 'Kosugi Maru', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+  .theme-I .spinner {
+    border: 12px solid #002244;
+    border-top-color: #00ffff;
+    box-shadow: 0 0 20px #00ffffaa;
+  }
+  .theme-I .typing-text {
+    border-right-color: #00ffff;
+  }
+  /* 青い雷エフェクト */
+  .lightning {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    width: 220px;
+    height: 180px;
+    background: url('https://cdn.pixabay.com/photo/2017/04/05/01/46/lightning-2207173_960_720.png') no-repeat center center;
+    background-size: contain;
+    animation: lightningFlash 3s linear infinite;
+    transform: translateX(-50%);
+    pointer-events: none;
+    opacity: 0.6;
+  }
+  @keyframes lightningFlash {
+    0%, 100% { opacity: 0.6 }
+    50% { opacity: 1 }
+  }
+
+  /* 戻るボタン */
+  .btn-back {
+    margin-top: 30px;
+    padding: 14px 32px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border: none;
+    color: white;
+    background: rgba(255 255 255 / 0.15);
+    box-shadow: 0 0 10px rgba(255 255 255 / 0.3);
+    backdrop-filter: blur(6px);
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  .btn-back:hover {
+    background: rgba(255 255 255 / 0.3);
+  }
+
+</style>
 </head>
 <body>
-  <h1>🎯 あたり！</h1>
-  <p>「チーズトッピング無料！」などの特典が当たったよ！</p>
-  <p>スタッフにこの画面を見せてね。</p>
+  <div id="effectContainer"></div>
+  <div class="typing-text fade-in" id="resultText"></div>
+  <div class="spinner fade-in" style="animation-delay: 1.5s;"></div>
+  <button class="btn-back fade-in" style="animation-delay: 3s;" id="btnBack">進行度を確認</button>
 
-  <a class="btn" href="stamp.html">📍 進捗を確認する</a>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get("id");
+  const texts = {
+    A: "ライバルは、全団体。おめでとう！",
+    B: "肉を求める本能、解放せよ！おめでとう！",
+    C: "それは、ただの串じゃない。おめでとう！",
+    D: "ブチアゲろ、牛肉魂！おめでとう！",
+    E: "もう一度食べたくなる、そんな味。おめでとう！",
+    F: "ネオンの中で炎が踊る…おめでとう！",
+    G: "香ばしさの極みへ…おめでとう！",
+    H: "神々の裁きが下る…おめでとう！",
+    I: "蒼き神の啓示…おめでとう！"
+  };
+
+  const theme = id && texts[id] ? `theme-${id}` : 'theme-A';
+
+  document.body.classList.add(theme);
+  document.getElementById('resultText').textContent = "";
+
+  // タイピングアニメ
+  function typeText(element, text, speed=60) {
+    let index = 0;
+    function typing() {
+      if (index <= text.length) {
+        element.textContent = text.slice(0, index);
+        index++;
+        setTimeout(typing, speed);
+      }
+    }
+    typing();
+  }
+  typeText(document.getElementById('resultText'), texts[id] || texts['A']);
+
+  // エフェクト追加
+  const effectContainer = document.getElementById('effectContainer');
+
+  function addEffect(themeId) {
+    // 一旦クリア
+    effectContainer.innerHTML = '';
+
+    switch(themeId) {
+      case 'B':
+        // 墨のにじみ風（和風）
+        const inkBlur = document.createElement('div');
+        inkBlur.className = 'ink-blur';
+        inkBlur.style.width = '150px';
+        inkBlur.style.height = '150px';
+        inkBlur.style.position = 'absolute';
+        inkBlur.style.top = '20%';
+        inkBlur.style.left = '50%';
+        inkBlur.style.transform = 'translateX(-50%)';
+        effectContainer.appendChild(inkBlur);
+        break;
+
+      case 'C':
+        // ふんわりスモーク
+        const smoke = document.createElement('div');
+        smoke.className = 'smoke';
+        effectContainer.appendChild(smoke);
+        break;
+
+      case 'D':
+        // スプレー風スプラッシュ
+        const splash = document.createElement('div');
+        splash.className = 'spray-splash';
+        splash.style.top = '25%';
+        splash.style.left = '50%';
+        splash.style.transform = 'translateX(-50%)';
+        effectContainer.appendChild(splash);
+        break;
+
+      case 'E':
+        // ゆらゆら波紋
+        const ripple = document.createElement('div');
+        ripple.className = 'ripple';
+        ripple.style.top = '30%';
+        ripple.style.left = '50%';
+        ripple.style.transform = 'translateX(-50%)';
+        effectContainer.appendChild(ripple);
+        break;
+
+      case 'F':
+        // 炎
+        const flame = document.createElement('div');
+        flame.className = 'flame';
+        effectContainer.appendChild(flame);
+        break;
+
+      case 'G':
+        // 煙パーティクル
+        const smokeParticles = document.createElement('div');
+        smokeParticles.className = 'smoke-particles';
+        effectContainer.appendChild(smokeParticles);
+        break;
+
+      case 'I':
+        // 青い雷
+        const lightning = document.createElement('div');
+        lightning.className = 'lightning';
+        effectContainer.appendChild(lightning);
+        break;
+
+      default:
+        // no extra effect for A,H
+        break;
+    }
+  }
+
+  addEffect(id);
+
+  // 戻るボタン動作
+  document.getElementById('btnBack').addEventListener('click', () => {
+    window.location.href = 'stamp.html';
+  });
+</script>
 </body>
 </html>
