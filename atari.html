@@ -3,69 +3,212 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>あたり！</title>
+  <title>あたり</title>
   <style>
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
       text-align: center;
-      transition: background 0.5s ease, color 0.5s ease;
+      height: 100vh;
+      transition: all 0.5s ease;
     }
 
     .message {
       font-size: 2rem;
-      margin: 1em;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+    }
+
+    .subtext {
+      font-size: 1rem;
+      margin-top: 0.3em;
+      opacity: 0.8;
     }
 
     .button {
-      background: transparent;
-      border: 2px solid currentColor;
-      padding: 10px 20px;
-      border-radius: 8px;
+      margin-top: 2em;
+      padding: 10px 24px;
       font-size: 1rem;
-      color: inherit;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: 0.3s ease;
     }
 
-    .button:hover {
-      background: rgba(255,255,255,0.1);
+    /* === Theme G === */
+    @import url('https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&display=swap');
+    .theme-G {
+      background: #fdf7f2;
+      color: #8b0000;
+      font-family: 'Kiwi Maru', serif;
+    }
+    .theme-G .button {
+      background-color: #8b0000;
+      color: #fff;
+      border: none;
+    }
+    .theme-G .button:hover {
+      background-color: #aa1e1e;
     }
 
-    /* ---------- Themes ---------- */
+    /* === Theme H === */
+    .theme-H {
+      background: radial-gradient(circle, #1a0000 0%, #000 100%);
+      color: #ff4444;
+      font-family: 'Share Tech Mono', monospace;
+      text-shadow: 0 0 6px red;
+      overflow: hidden;
+      position: relative;
+    }
+    .theme-H .button {
+      background-color: transparent;
+      border: 2px solid red;
+      color: red;
+    }
+    .theme-H .button:hover {
+      background-color: #ff000033;
+    }
+    .theme-H .glitch {
+      position: relative;
+    }
+    .theme-H .glitch::before,
+    .theme-H .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      width: 100%;
+      opacity: 0.7;
+    }
+    .theme-H .glitch::before {
+      color: red;
+      z-index: -1;
+      animation: glitch-h 0.3s infinite linear alternate-reverse;
+    }
+    .theme-H .glitch::after {
+      color: #ff9999;
+      z-index: -2;
+      animation: glitch-h 0.2s infinite linear alternate-reverse;
+    }
+    @keyframes glitch-h {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(2px, -1px); }
+      60% { transform: translate(-1px, 1px); }
+      80% { transform: translate(1px, -2px); }
+      100% { transform: translate(0); }
+    }
 
-    .theme-A { background-color: #000; color: gold; }
-    .theme-B { background: #f4f1ec url('images/bg_b.jpg') center/cover no-repeat; color: #222; }
-    .theme-C { background: linear-gradient(to bottom, #ddd, #aaa); color: #111; }
-    .theme-D { background: url('images/bg_d.jpg') center/cover no-repeat; color: #fff; }
-    .theme-E { background: #f0f4ff; color: #444; }
-    .theme-F { background: #111; color: #39ff14; }
-    .theme-G { background: #f5e3c0; color: #600; }
-    .theme-H { background: repeating-linear-gradient(45deg, #000, #111 10px, #000 20px); color: red; }
-    .theme-I { background: #000022; color: #00ffff; }
-
-    /* Optional UI tweaks per theme */
-    .theme-E .message { font-style: italic; opacity: 0.9; }
-    .theme-H .message { text-shadow: 0 0 10px red; }
-    .theme-I .message { text-shadow: 0 0 15px #00ffff; }
+    /* === Theme I === */
+    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500&display=swap');
+    .theme-I {
+      background: linear-gradient(to bottom, #000015, #001f3f);
+      color: #33ccff;
+      font-family: 'Rajdhani', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+    .theme-I .button {
+      border: 2px solid #33ccff;
+      color: #33ccff;
+      background-color: transparent;
+    }
+    .theme-I .button:hover {
+      background-color: #33ccff20;
+    }
+    .theme-I .glitch {
+      position: relative;
+      display: inline-block;
+      color: #33ccff;
+    }
+    .theme-I .glitch::before,
+    .theme-I .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      color: #00bcd4;
+      opacity: 0.7;
+    }
+    .theme-I .glitch::before {
+      top: -1px;
+      left: 2px;
+      text-shadow: -1px 0 cyan;
+      animation: glitch-i-1 2.4s infinite linear alternate-reverse;
+    }
+    .theme-I .glitch::after {
+      top: 1px;
+      left: -2px;
+      text-shadow: 1px 0 blue;
+      animation: glitch-i-2 1.8s infinite linear alternate-reverse;
+    }
+    .theme-I::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 255, 255, 0.02),
+        rgba(0, 255, 255, 0.02) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes glitch-i-1 {
+      0% { clip: rect(4px,9999px,8px,0); transform: translate(1px,-1px); }
+      40% { clip: rect(6px,9999px,12px,0); transform: translate(2px,1px); }
+      100% { clip: rect(5px,9999px,8px,0); transform: translate(-1px,-1px); }
+    }
+    @keyframes glitch-i-2 {
+      0% { clip: rect(1px,9999px,6px,0); transform: translate(-1px,0); }
+      50% { clip: rect(5px,9999px,10px,0); transform: translate(-2px,-1px); }
+      100% { clip: rect(4px,9999px,9px,0); transform: translate(0,-1px); }
+    }
   </style>
 </head>
 <body>
-  <div class="message" id="resultText">あたり！ 🎯 チーズトッピング無料！</div>
+  <div class="message" id="mainText">あたり！</div>
+  <div class="message" id="subText">チーズトッピング無料！</div>
+  <div class="subtext" id="noteText">スタッフにこの画面を提示してください</div>
   <button class="button" onclick="location.href='stamp.html'">進行度を確認</button>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id");
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get("id")?.toUpperCase();
+    document.body.classList.add(`theme-${theme}`);
 
-    if (id) {
-      document.body.classList.add(`theme-${id}`);
+    const mainText = document.getElementById("mainText");
+    const subText = document.getElementById("subText");
+    const noteText = document.getElementById("noteText");
+
+    switch (theme) {
+      case "G":
+        mainText.innerHTML = "🔥 あたり";
+        subText.innerText = "炎が、お前を選んだ。";
+        noteText.innerText = "チーズトッピング無料";
+        break;
+      case "H":
+        mainText.innerHTML = "<span class='glitch' data-text='🔻 ATARI: ERROR'>🔻 ATARI: ERROR</span>";
+        subText.innerHTML = "<span class='glitch' data-text='Access Level: OVERRIDE'>Access Level: OVERRIDE</span>";
+        noteText.innerText = "チーズトッピング無料：この異常を提示せよ";
+        break;
+      case "I":
+        mainText.innerHTML = "<span class='glitch' data-text='⚡ あたり'>⚡ あたり</span>";
+        subText.innerHTML = "<span class='glitch' data-text='運命はデータを超えた。'>運命はデータを超えた。</span>";
+        noteText.innerText = "トッピング無料：スタッフに提示を。";
+        break;
+      default:
+        mainText.innerText = "エラー";
+        subText.innerText = "QRコードが無効です。";
+        noteText.innerText = "";
+        break;
     }
   </script>
 </body>
