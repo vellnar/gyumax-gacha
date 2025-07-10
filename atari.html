@@ -39,7 +39,108 @@
       transition: 0.3s ease;
     }
 
-    /* === Theme G === */
+    /* ---------- Theme A ---------- */
+    .theme-A {
+      background: #000;
+      color: #d4af37;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .theme-A .button {
+      background: transparent;
+      border: 2px solid currentColor;
+      color: inherit;
+    }
+    .theme-A .button:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ---------- Theme B ---------- */
+    @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1&display=swap');
+    .theme-B {
+      background: #111 radial-gradient(ellipse at center, rgba(255,90,0,0.05), transparent 70%);
+      color: #fdf6e3;
+      font-family: 'Shippori Mincho B1', serif;
+    }
+    .theme-B .button {
+      border: 2px solid #ff6600;
+      color: #ff6600;
+      background: transparent;
+    }
+    .theme-B .button:hover {
+      background: #ff6600;
+      color: #111;
+    }
+
+    /* ---------- Theme C ---------- */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+    .theme-C {
+      background: radial-gradient(circle at center, #1a1a1a 0%, #000 80%);
+      color: #fff;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    .theme-C .button {
+      border: 1.5px solid #ffffffcc;
+      color: #ffffffcc;
+      background: transparent;
+    }
+    .theme-C .button:hover {
+      background: #ffffffcc;
+      color: #000;
+    }
+    .accent { color: #ffd700; }
+
+    /* ---------- Theme D ---------- */
+    @import url('https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap');
+    .theme-D {
+      background: linear-gradient(135deg, #e53935 10%, #ffd600 50%, #1976d2 90%);
+      color: #111;
+      font-family: 'Yusei Magic', sans-serif;
+    }
+    .theme-D .button {
+      background-color: #fff200;
+      border: none;
+      color: #000;
+      font-weight: bold;
+    }
+    .theme-D .button:hover {
+      background-color: #ffec40;
+    }
+
+    /* ---------- Theme E ---------- */
+    @import url('https://fonts.googleapis.com/css2?family=Yomogi&display=swap');
+    .theme-E {
+      background: linear-gradient(to bottom, #aab2aa, #d3d6d4);
+      color: #1c1c1c;
+      font-family: 'Yomogi', cursive;
+    }
+    .theme-E .button {
+      background-color: #4f5e4f;
+      color: #fff;
+      border: none;
+      font-weight: bold;
+    }
+    .theme-E .button:hover {
+      background-color: #738f7a;
+    }
+
+    /* ---------- Theme F ---------- */
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    .theme-F {
+      background: radial-gradient(circle at center, #000 40%, #1a1a1a 100%);
+      color: #00e5ff;
+      font-family: 'Share Tech Mono', monospace;
+      text-shadow: 0 0 8px #00e5ff;
+    }
+    .theme-F .button {
+      background-color: transparent;
+      border: 2px solid #00e5ff;
+      color: #00e5ff;
+    }
+    .theme-F .button:hover {
+      background-color: #00e5ff22;
+    }
+
+    /* ---------- Theme G ---------- */
     @import url('https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&display=swap');
     .theme-G {
       background: #fdf7f2;
@@ -55,14 +156,12 @@
       background-color: #aa1e1e;
     }
 
-    /* === Theme H === */
+    /* ---------- Theme H ---------- */
     .theme-H {
       background: radial-gradient(circle, #1a0000 0%, #000 100%);
       color: #ff4444;
       font-family: 'Share Tech Mono', monospace;
       text-shadow: 0 0 6px red;
-      overflow: hidden;
-      position: relative;
     }
     .theme-H .button {
       background-color: transparent;
@@ -102,7 +201,7 @@
       100% { transform: translate(0); }
     }
 
-    /* === Theme I === */
+    /* ---------- Theme I ---------- */
     @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500&display=swap');
     .theme-I {
       background: linear-gradient(to bottom, #000015, #001f3f);
@@ -122,7 +221,6 @@
     .theme-I .glitch {
       position: relative;
       display: inline-block;
-      color: #33ccff;
     }
     .theme-I .glitch::before,
     .theme-I .glitch::after {
@@ -131,7 +229,6 @@
       left: 0;
       width: 100%;
       overflow: hidden;
-      color: #00bcd4;
       opacity: 0.7;
     }
     .theme-I .glitch::before {
@@ -189,6 +286,36 @@
     const noteText = document.getElementById("noteText");
 
     switch (theme) {
+      case "A":
+        mainText.innerHTML = "🎯 あたり！";
+        subText.innerText = "チーズトッピング無料！";
+        noteText.innerText = "※スタッフにこの画面を提示してください";
+        break;
+      case "B":
+        mainText.innerHTML = "🔥 あたり！";
+        subText.innerText = "本能が導いた勝利！";
+        noteText.innerText = "チーズトッピング無料！";
+        break;
+      case "C":
+        mainText.innerHTML = "<span class='accent'>あたり。</span>";
+        subText.innerText = "これは、ただのサービスじゃない。";
+        noteText.innerText = "チーズトッピング無料。";
+        break;
+      case "D":
+        mainText.innerHTML = "💥 あたり!!";
+        subText.innerText = "肉魂炸裂！牛串1本プレゼント！";
+        noteText.innerText = "スタッフにこの画面を全力で見せろッ！";
+        break;
+      case "E":
+        mainText.innerHTML = "やさしい あたり。";
+        subText.innerText = "もう一本、プレゼント。";
+        noteText.innerText = "ベンチでしみじみ味わってもいいんだよ。";
+        break;
+      case "F":
+        mainText.innerHTML = "⚡ YOU WIN.";
+        subText.innerText = "“The Taste of Fire” is yours.";
+        noteText.innerText = "🔥 牛串1本プレゼント（画面提示）";
+        break;
       case "G":
         mainText.innerHTML = "🔥 あたり";
         subText.innerText = "炎が、お前を選んだ。";
