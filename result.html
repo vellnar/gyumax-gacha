@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>抽選結果</title>
+<style>
+  /* 共通スタイル */
+  body {
+    margin: 0; padding: 0;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100vh;
+    transition: all 0.5s ease;
+  }
+  .message {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+  }
+  .main-message {
+    font-size: 2.4rem;
+  }
+  .sub-message {
+    font-size: 1.2rem;
+    margin-top: 0.3em;
+    opacity: 0.8;
+    max-width: 600px;
+  }
+  .note-message {
+    font-size: 1rem;
+    margin-top: 0.6em;
+    opacity: 0.7;
+  }
+  .button, .btn {
+    margin-top: 2em;
+    padding: 10px 26px;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  /* --------- 当たり用 --------- */
+  .win .main-message {
+    font-weight: 900;
+  }
+
+  /* --------- はずれ用 --------- */
+  .lose .main-message {
+    font-weight: 700;
+  }
+
+  /* --------- Theme A --------- */
+  .theme-A.win {
+    background: #000;
+    color: #d4af37;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .theme-A.lose {
+    background: #111;
+    color: #ccc;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .theme-A .button, .theme-A .btn {
+    border: 2px solid currentColor;
+    background: transparent;
+    color: inherit;
+  }
+  .theme-A .button:hover, .theme-A .btn:hover {
+    background: rgba(255,255,255,0.1);
+  }
+  .theme-A.lose .btn {
+    background-color: #555;
+  }
+  .theme-A.lose .btn:hover {
+    background-color: #777;
+  }
+
+  /* --------- Theme B --------- */
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1&display=swap');
+  .theme-B.win {
+    background: #111 radial-gradient(ellipse at center, rgba(255,90,0,0.05), transparent 70%);
+    color: #fdf6e3;
+    font-family: 'Shippori Mincho B1', serif;
+  }
+  .theme-B.lose {
+    background: #2b1b1b;
+    color: #ffdfcf;
+    font-family: 'Shippori Mincho B1', serif;
+  }
+  .theme-B .button, .theme-B .btn {
+    background: transparent;
+    border: 2px solid #ff6600;
+    color: #ff6600;
+  }
+  .theme-B .button:hover, .theme-B .btn:hover {
+    background: #ff6600;
+    color: #111;
+  }
+  .theme-B.lose h1 {
+    color: #ff6347;
+    text-shadow: 1px 1px 3px #000;
+  }
+  .theme-B.lose .btn {
+    background-color: #aa3322;
+  }
+  .theme-B.lose .btn:hover {
+    background-color: #cc5544;
+  }
+
+  /* --------- Theme C --------- */
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+  .theme-C.win {
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000 80%);
+    color: #fff;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .theme-C.lose {
+    background: radial-gradient(circle at center, #1a1a1a, #000);
+    color: #e0e0e0;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .theme-C .button, .theme-C .btn {
+    border: 1.5px solid #ffffffcc;
+    color: #ffffffcc;
+    background: transparent;
+  }
+  .theme-C .button:hover, .theme-C .btn:hover {
+    background: #ffffffcc;
+    color: #000;
+  }
+  .theme-C.lose h1 {
+    color: #888;
+  }
+  .theme-C.lose .btn {
+    background-color: #666;
+  }
+  .theme-C.lose .btn:hover {
+    background-color: #aaa;
+    color: #000;
+  }
+  .accent { color: #ffd700; }
+
+  /* --------- Theme D --------- */
+  @import url('https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap');
+  .theme-D.win {
+    background: linear-gradient(135deg, #e53935 10%, #ffd600 50%, #1976d2 90%);
+    color: #111;
+    font-family: 'Yusei Magic', sans-serif;
+  }
+  .theme-D.lose {
+    background: repeating-linear-gradient(45deg, #ff3d00, #ff3d00 20px, #1976d2 20px, #1976d2 40px);
+    color: #fff;
+    font-family: 'Yusei Magic', sans-serif;
+  }
+  .theme-D .button, .theme-D .btn {
+    background-color: #fff200;
+    border: none;
+    color: #000;
+    font-weight: bold;
+  }
+  .theme-D .button:hover, .theme-D .btn:hover {
+    background-color: #ffec40;
+  }
+  .theme-D.lose h1 {
+    text-shadow: 2px 2px #000;
+    color: #ffd600;
+  }
+  .theme-D.lose .btn {
+    background-color: #111;
+    color: #ffd600;
+    border: 2px solid #ffd600;
+  }
+  .theme-D.lose .btn:hover {
+    background-color: #ffd600;
+    color: #111;
+  }
+
+  /* --------- Theme E --------- */
+  @import url('https://fonts.googleapis.com/css2?family=Yomogi&display=swap');
+  .theme-E.win {
+    background: linear-gradient(to bottom, #aab2aa, #d3d6d4);
+    color: #1c1c1c;
+    font-family: 'Yomogi', cursive;
+  }
+  .theme-E.lose {
+    background: linear-gradient(to top, #bfc5c2, #e4e4e4);
+    color: #3a3a3a;
+    font-family: 'Yomogi', cursive;
+  }
+  .theme-E .button, .theme-E .btn {
+    background-color: #4f5e4f;
+    color: #fff;
+    border: none;
+    font-weight: bold;
+  }
+  .theme-E .button:hover, .theme-E .btn:hover {
+    background-color: #738f7a;
+  }
+  .theme-E.lose h1 {
+    color: #4f5e4f;
+  }
+  .theme-E.lose .btn {
+    background-color: #4f5e4f;
+    color: #fff;
+    border-radius: 8px;
+  }
+  .theme-E.lose .btn:hover {
+    background-color: #738f7a;
+    color: #fff;
+  }
+
+  /* --------- Theme F --------- */
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+  .theme-F.win {
+    background: radial-gradient(circle at center, #000 40%, #1a1a1a 100%);
+    color: #00e5ff;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 8px #00e5ff;
+  }
+  .theme-F.lose {
+    background: linear-gradient(to bottom, #0d0d0d, #1a1a1a);
+    color: #8fd3ff;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 4px #0099cc;
+  }
+  .theme-F .button, .theme-F .btn {
+    background-color: transparent;
+    border: 2px solid #00e5ff;
+    color: #00e5ff;
+  }
+  .theme-F .button:hover, .theme-F .btn:hover {
+    background-color: #00e5ff22;
+  }
+  .theme-F.lose h1 {
+    color: #00bcd4;
+  }
+  .theme-F.lose .btn {
+    background-color: transparent;
+    border: 2px solid #00bcd4;
+    color: #00bcd4;
+  }
+  .theme-F.lose .btn:hover {
+    background-color: #00bcd433;
+  }
+
+  /* --------- Theme G --------- */
+  @import url('https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&display=swap');
+  .theme-G.win {
+    background: #fdf7f2;
+    color: #8b0000;
+    font-family: 'Kiwi Maru', serif;
+  }
+  .theme-G.lose {
+    background: #fff7f0;
+    color: #8b0000;
+    font-family: 'Kiwi Maru', serif;
+  }
+  .theme-G .button, .theme-G .btn {
+    background-color: #8b0000;
+    color: #fff;
+    border: none;
+  }
+  .theme-G .button:hover, .theme-G .btn:hover {
+    background-color: #aa1e1e;
+  }
+  .theme-G.lose h1 {
+    color: #c0392b;
+  }
+
+  /* --------- Theme H --------- */
+  .theme-H.win {
+    background: radial-gradient(circle, #1a0000 0%, #000 100%);
+    color: #ff4444;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 6px red;
+  }
+  .theme-H.lose {
+    background: radial-gradient(circle, #1a0000 0%, #000 100%);
+    color: #ff4444;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 6px red;
+  }
+  .theme-H .button, .theme-H .btn {
+    background-color: transparent;
+    border: 2px solid red;
+    color: red;
+  }
+  .theme-H .button:hover, .theme-H .btn:hover {
+    background-color: #ff000033;
+  }
+  .theme-H.win .glitch,
+  .theme-H.lose h1 {
+    position: relative;
+  }
+  .theme-H.win .glitch::before,
+  .theme-H.win .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    width: 100%;
+    opacity: 0.7;
+  }
+  .theme-H.win .glitch::before {
+    color: red;
+    z-index: -1;
+    animation: glitch-h 0.3s infinite linear alternate-reverse;
+  }
+  .theme-H.win .glitch::after {
+    color: #ff9999;
+    z-index: -2;
+    animation: glitch-h 0.2s infinite linear alternate-reverse;
+  }
+  @keyframes glitch-h {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(2px, -1px); }
+    60% { transform: translate(-1px, 1px); }
+    80% { transform: translate(1px, -2px); }
+    100% { transform: translate(0); }
+  }
+
+  /* --------- Theme I --------- */
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500&display=swap');
+  .theme-I.win {
+    background: linear-gradient(to bottom, #000015, #001f3f);
+    color: #33ccff;
+    font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+  .theme-I.lose {
+    background: linear-gradient(to bottom, #000015, #001f3f);
+    color: #33ccff;
+    font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+  .theme-I .button, .theme-I .btn {
+    border: 2px solid #33ccff;
+    color: #33ccff;
+    background-color: transparent;
+  }
+  .theme-I .button:hover, .theme-I .btn:hover {
+    background-color: #33ccff20;
+  }
+  .theme-I .glitch,
+  .theme-I h1 {
+    position: relative;
+    display: inline-block;
+  }
+  .theme-I .glitch::before,
+  .theme-I .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    opacity: 0.7;
+  }
+  .theme-I .glitch::before {
+    top: -1px;
+    left: 2px;
+    text-shadow: -1px 0 cyan;
+    animation: glitch-i-1 2.4s infinite linear alternate-reverse;
+  }
+  .theme-I .glitch::after {
+    top: 1px;
+    left: -2px;
+    text-shadow: 1px 0 blue;
+    animation: glitch-i-2 1.8s infinite linear alternate-reverse;
+  }
+  .theme-I::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 255, 255, 0.02),
+      rgba(0, 255, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+  @keyframes glitch-i-1 {
+    0% { clip: rect(4px,9999px,8px,0); transform: translate(1px,-1px); }
+    40% { clip: rect(6px,9999px,12px,0); transform: translate(2px,1px); }
+    100% { clip: rect(5px,9999px,8px,0); transform: translate(-1px,-1px); }
+  }
+  @keyframes glitch-i-2 {
+    0% { clip: rect(1px,9999px,6px,0); transform: translate(-1px,0); }
+    50% { clip: rect(5px,9999px,10px,0); transform: translate(-2px,-1px); }
+    100% { clip: rect(4px,9999px,9px,0); transform: translate(0,-1px); }
+  }
+</style>
+</head>
+<body>
+  <div id="content">
+    <div class="message main-message" id="mainText">読み込み中…</div>
+    <div class="message sub-message" id="subText"></div>
+    <div class="message note-message" id="noteText"></div>
+    <button class="button" id="progressBtn">進行度を確認</button>
+  </div>
+
+<script>
+(() => {
+  const params = new URLSearchParams(window.location.search);
+  const result = params.get("result")?.toLowerCase();
+  const themeParam = (params.get("id") || "").toUpperCase();
+
+  // 有効なテーマ一覧（A～I）
+  const validThemes = ["A","B","C","D","E","F","G","H","I"];
+
+  // テーマが不正ならエラー画面へリダイレクト
+  if (!validThemes.includes(themeParam)) {
+    window.location.href = "error.html";
+    return;
+  }
+
+  const theme = themeParam;
+
+  // bodyにテーマと結果のクラス付与
+  document.body.classList.add(`theme-${theme}`);
+  if (result === "win" || result === "atari" || result === "あたり") {
+    document.body.classList.add("win");
+  } else if (result === "lose" || result === "hazure" || result === "はずれ") {
+    document.body.classList.add("lose");
+  } else {
+    document.body.classList.add("lose"); // デフォルトははずれ扱い
+  }
+
+  const mainText = document.getElementById("mainText");
+  const subText = document.getElementById("subText");
+  const noteText = document.getElementById("noteText");
+  const progressBtn = document.getElementById("progressBtn");
+
+  // ボタン押下時の挙動（任意で変更してください）
+  progressBtn.onclick = () => {
+    location.href = "stamp.html";
+  };
+
+
+  // テーマ別、結果別テキスト切替用マップ
+  const textMap = {
+    "A": {
+      win: {
+        main: "🎯 あたり！",
+        sub: "チーズトッピング無料！",
+        note: "※スタッフにこの画面を提示してください"
+      },
+      lose: {
+        main: "🔘 はずれ…",
+        sub: "今日は運がなかった。だが、まだ機会はある。",
+        note: ""
+      }
+    },
+    "B": {
+      win: {
+        main: "🌟 大当たり！",
+        sub: "おめでとうございます！特別景品を獲得！",
+        note: "※店員にこの画面を見せてください"
+      },
+      lose: {
+        main: "❌ 残念！",
+        sub: "次回に期待しましょう！",
+        note: ""
+      }
+    },
+    "C": {
+      win: {
+        main: "🎉 あたり！",
+        sub: "無料トッピングゲット！",
+        note: "スタッフに画面提示をお忘れなく"
+      },
+      lose: {
+        main: "😞 はずれです",
+        sub: "また挑戦してくださいね！",
+        note: ""
+      }
+    },
+    "D": {
+      win: {
+        main: "✨ あたり！",
+        sub: "特別な景品をゲット！",
+        note: "スタッフにこの画面を提示してください"
+      },
+      lose: {
+        main: "😭 はずれ…",
+        sub: "次のチャンスを待ちましょう！",
+        note: ""
+      }
+    },
+    "E": {
+      win: {
+        main: "🍀 あたり！",
+        sub: "おめでとうございます！トッピング無料です。",
+        note: "スタッフに画面を見せてください"
+      },
+      lose: {
+        main: "😔 はずれ",
+        sub: "またチャレンジしてください！",
+        note: ""
+      }
+    },
+    "F": {
+      win: {
+        main: "💎 大当たり！",
+        sub: "特別トッピングをプレゼント！",
+        note: "スタッフに画面提示をお願いします"
+      },
+      lose: {
+        main: "❗ はずれです",
+        sub: "次回も挑戦してください！",
+        note: ""
+      }
+    },
+    "G": {
+      win: {
+        main: "🎊 あたり！",
+        sub: "無料トッピングをどうぞ！",
+        note: "スタッフに画面をお見せください"
+      },
+      lose: {
+        main: "🚫 はずれ…",
+        sub: "次回の挑戦をお待ちしています",
+        note: ""
+      }
+    },
+    "H": {
+      win: {
+        main: "🔥 あたり！",
+        sub: "特別サービスを獲得しました！",
+        note: "スタッフに画面を見せてください"
+      },
+      lose: {
+        main: "❌ はずれです",
+        sub: "また挑戦してください！",
+        note: ""
+      }
+    },
+    "I": {
+      win: {
+        main: "⚡ 大当たり！",
+        sub: "トッピング無料ゲット！",
+        note: "スタッフに画面を提示してください"
+      },
+      lose: {
+        main: "✖️ はずれ…",
+        sub: "次のチャンスをお楽しみに！",
+        note: ""
+      }
+    }
+  };
+
+  // 該当テーマのテキストを取得。なければAをデフォルトにする
+  const themeTexts = textMap[theme] || textMap["A"];
+  const stateTexts = document.body.classList.contains("win") ? themeTexts.win : themeTexts.lose;
+
+  // 画面にテキスト反映
+  mainText.textContent = stateTexts.main;
+  subText.textContent = stateTexts.sub;
+  noteText.textContent = stateTexts.note;
+})();
+</script>
+</body>
+</html>
