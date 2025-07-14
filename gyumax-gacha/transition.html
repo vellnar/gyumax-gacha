@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>抽選ページ</title>
+<style>
+  body {
+    margin: 0;
+    padding: 80px 20px;
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+    transition: all 0.5s ease;
+  }
+  .spinner {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    margin: 40px auto;
+    display: none;
+    animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 15px rgba(255,255,255,0.4);
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  .text {
+    font-size: 1.4rem;
+    margin-top: 20px;
+    min-height: 1.5em;
+  }
+  button {
+    font-size: 1.4rem;
+    padding: 12px 30px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-color: #0078d7;
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #005ea2;
+  }
+</style>
+</head>
+<body>
+  <h1>抽選ページ</h1>
+  <div>
+    <select id="posterId" aria-label="ポスターID選択">
+      <option value="">ポスターIDを選択してください</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+      <option value="F">F</option>
+      <option value="G">G</option>
+      <option value="H">H</option>
+      <option value="I">I</option>
+    </select>
+  </div>
+  <button id="startBtn" disabled>抽選開始</button>
+  <div class="spinner" id="spinner"></div>
+  <div class="text" id="loadingText"></div>
+
+<script>
+(() => {
+  const posterSelect = document.getElementById('posterId');
+  const startBtn = document.getElementById('startBtn');
+  const spinner = document.getElementById('spinner');
+  const loadingText = document.getElementById('loadingText');
+
+  // テーマ別メッセージ
+  const loadingTextMap = {
+    A: "ライバルは、全団体。抽選中...",
+    B: "肉を求める本能 抽選中...",
+    C: "それは、ただの串じゃない 抽選中...",
+    D: "ブチアゲろ、牛肉魂！ 抽選中...",
+    E: "もう一度食べたくなる、そんな味。 抽選中...",
+    F: "ネオンの中で炎が踊る… 抽選中...",
+    G: "香ばしさの極みへ… 抽選中...",
+    H: "神々の裁きが下る… 抽選中...",
+    I: "蒼き神の啓示… 抽選中..."
+  };
+
+  // 選択があればボタンを活性化
+  posterSelect.addEventListener('change', () => {
+    startBtn.disabled = !loadingTextMap[posterSelect.value];
+  });
+
+  function generateToken(length = 16) {
+    // ランダム英数字トークン生成
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+    for(let i=0; i<length; i++) {
+      token += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return token;
+  }
+
+  startBtn.addEventListener('click', () => {
+    const id = posterSelect.value;
+    if (!loadingTextMap[id]) {
+      alert("有効なポスターIDを選択してください。");
+      return;
+    }
+
+    // ボタンとセレクトを無効化し、スピナー表示・メッセージ表示
+    startBtn.disabled = true;
+    posterSelect.disabled = true;
+    spinner.style.display = "block";
+    loadingText.textContent = loadingTextMap[id];
+
+    // 抽選（30%で当たり）
+    const isAtari = Math.random() < 0.3;
+
+    // トークン生成
+    const token = generateToken();
+
+    // 3秒後に結果ページへ遷移（トークン付き）
+    setTimeout(() => {
+      const nextUrl = isAtari
+        ? `result.html?id=${id}&result=win&token=${encodeURIComponent(token)}`
+        : `result.html?id=${id}&result=lose&token=${encodeURIComponent(token)}`;
+      window.location.href = nextUrl;
+    }, 3000);
+  });
+})();
+</script>
+</body>
+</html>
