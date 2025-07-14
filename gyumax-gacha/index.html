@@ -5,61 +5,40 @@
   <title>ギュウMAX!! ガチャ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { box-sizing: border-box; }
     body {
+      margin: 0;
       background: #000;
       color: #fff;
-      text-align: center;
-      margin: 0;
-      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
     }
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-    p {
-      font-size: 1rem;
-      margin-bottom: 30px;
-    }
-    button {
-      font-size: 1.2rem;
-      padding: 15px 30px;
-      background: #f39c12;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      max-width: 300px;
-    }
-    button:hover {
-      background: #e67e22;
+    .message {
+      font-size: 1.4rem;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎯 ギュウMAX!! くじ引き 🎯</h1>
-    <p>1回だけ！ボタンを押して運試し！</p>
-    <button onclick="draw()">ガチャを引く</button>
-  </div>
+  <div class="message" id="statusMessage">読み込み中...</div>
 
   <script>
-    function draw() {
-      if (localStorage.getItem('gyumax_drawn')) {
-        window.location.href = localStorage.getItem('gyumax_drawn');
-        return;
-      }
-      const isWin = Math.random() < 0.3;
-      const url = isWin ? 'atari.html' : 'hazure.html';
-      localStorage.setItem('gyumax_drawn', url);
-      window.location.href = url;
+    const statusEl = document.getElementById("statusMessage");
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get("id");
+
+    const validIds = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+
+    if (!id || !validIds.includes(id)) {
+      statusEl.textContent = "無効なアクセスです。ポスターQRコードから読み込んでください。";
+    } else {
+      statusEl.textContent = "抽選ページに移動します...";
+      setTimeout(() => {
+        window.location.href = `draw.html?id=${id}`;
+      }, 1000);
     }
   </script>
 </body>

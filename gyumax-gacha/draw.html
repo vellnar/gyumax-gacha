@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>抽選ページ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      background-color: #222;
+      flex-direction: column;
+    }
+    /* テーマごとに背景色や画像を変えたい場合はクラスで対応 */
+    body.theme-B {
+      background: linear-gradient(135deg, #1b3a1a 0%, #064006 100%);
+    }
+    #spinner {
+      border: 8px solid #ccc;
+      border-top: 8px solid #4caf50;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      animation: spin 1.2s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% {transform: rotate(0deg);}
+      100% {transform: rotate(360deg);}
+    }
+  </style>
+</head>
+<body>
+  <div id="spinner"></div>
+  <div id="message">抽選準備中...</div>
+
+  <script>
+    (function(){
+      // 1. URLパラメータからid取得
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id') || 'default';
+
+      // 2. テーマ決定（bodyにクラスを付与）
+      document.body.classList.add(`theme-${id}`);
+
+      const STORAGE_KEY = `gyumax-token-${id}`;
+
+      // 3. ローカルストレージにトークンがあるかチェック
+      const existingToken = localStorage.getItem(STORAGE_KEY);
+      if(existingToken) {
+        // 既にトークンがあればすぐに結果ページへリダイレクト
+        location.href = `result.html?id=${id}&token=${existingToken}`;
+        return;
+      }
+
+      // 4. 抽選中の演出表示
+      const message = document.getElementById('message');
+      message.textContent = '肉を求める本能 抽選中…';
+
+      // 5. 抽選実施（0.3の確率で当たり）
+      function doLottery() {
+        const rand = Math.random();
+        const isWin = rand < 0.3;
+        return isWin ? 'win' : 'lose';
+      }
+
+      // 6. トークン生成（シンプルにID+結果+タイムスタンプなど）
+      function generateToken(result) {
+        return btoa(`${id}-${result}-${Date.now()}`); // base64エンコードした文字列
+      }
+
+      // 7. 3秒後に抽選結果をlocalStorageに保存して結果ページへリダイレクト
+      setTimeout(() => {
+        const result = doLottery();
+        const token = generateToken(result);
+        localStorage.setItem(STORAGE_KEY, token);
+        location.href = `result.html?id=${id}&token=${token}`;
+      }, 3000);
+
+    })();
+  </script>
+</body>
+</html>
