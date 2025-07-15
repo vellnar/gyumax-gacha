@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>抽選結果</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>抽選結果</title>
 <style>
   /* 共通スタイル */
   body {
@@ -417,26 +417,25 @@
   const params = new URLSearchParams(window.location.search);
   const result = params.get("result")?.toLowerCase();
   const themeParam = (params.get("id") || "").toUpperCase();
+  const token = params.get("token");
+  const storedToken = sessionStorage.getItem("gyumax_token");
 
-  // 有効なテーマ一覧（A～I）
   const validThemes = ["A","B","C","D","E","F","G","H","I"];
 
-  // テーマが不正ならエラー画面へリダイレクト
-  if (!validThemes.includes(themeParam)) {
+  // トークン不一致または不正テーマ → エラーへ
+  if (!token || token !== storedToken || !validThemes.includes(themeParam)) {
     window.location.href = "error.html";
     return;
   }
 
   const theme = themeParam;
 
-  // bodyにテーマと結果のクラス付与
+  // body にクラス付与
   document.body.classList.add(`theme-${theme}`);
   if (result === "win" || result === "atari" || result === "あたり") {
     document.body.classList.add("win");
-  } else if (result === "lose" || result === "hazure" || result === "はずれ") {
-    document.body.classList.add("lose");
   } else {
-    document.body.classList.add("lose"); // デフォルトははずれ扱い
+    document.body.classList.add("lose");
   }
 
   const mainText = document.getElementById("mainText");
@@ -444,13 +443,10 @@
   const noteText = document.getElementById("noteText");
   const progressBtn = document.getElementById("progressBtn");
 
-  // ボタン押下時の挙動（任意で変更してください）
   progressBtn.onclick = () => {
     location.href = "stamp.html";
   };
 
-
-  // テーマ別、結果別テキスト切替用マップ
   const textMap = {
     "A": {
       win: {
@@ -562,11 +558,9 @@
     }
   };
 
-  // 該当テーマのテキストを取得。なければAをデフォルトにする
   const themeTexts = textMap[theme] || textMap["A"];
   const stateTexts = document.body.classList.contains("win") ? themeTexts.win : themeTexts.lose;
 
-  // 画面にテキスト反映
   mainText.textContent = stateTexts.main;
   subText.textContent = stateTexts.sub;
   noteText.textContent = stateTexts.note;
