@@ -6,14 +6,9 @@
   <title>スタンプラリー進捗</title>
   <style>
     * { box-sizing: border-box; }
-
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow-x: hidden;
+      margin: 0; padding: 0; height: 100%; overflow-x: hidden;
     }
-
     body {
       font-family: 'Segoe UI', sans-serif;
       color: #cceeff;
@@ -23,8 +18,8 @@
       justify-content: flex-start;
       min-height: 100vh;
       position: relative;
+      background: #001a26;
     }
-
     body::before {
       content: "";
       position: fixed;
@@ -35,7 +30,6 @@
       opacity: 1;
       pointer-events: none;
     }
-
     body::after {
       content: "";
       position: fixed;
@@ -48,18 +42,15 @@
       z-index: 1;
       filter: blur(2px);
     }
-
     body.complete::after {
       animation-duration: 1.2s;
       background: radial-gradient(circle, rgba(0,255,255,0.5) 0%, transparent 70%);
       filter: blur(4px) drop-shadow(0 0 15px #00ffff);
     }
-
     @keyframes pulseLight {
       0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
       50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
     }
-
     h1 {
       margin-top: 40px;
       font-size: 2rem;
@@ -67,7 +58,19 @@
       position: relative;
       z-index: 2;
     }
-
+    h1.glitch-title {
+      animation: text-glitch 1.5s infinite;
+      color: #00ffff;
+      text-shadow: 2px 0 #00f, -2px 0 #f0f, 0 2px #0ff;
+    }
+    @keyframes text-glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(1px, -1px); }
+      40% { transform: translate(-2px, 1px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(-1px, -2px); }
+      100% { transform: translate(0); }
+    }
     .progress-bar {
       width: 90%;
       max-width: 600px;
@@ -80,8 +83,8 @@
       position: relative;
       z-index: 2;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-
     .progress-bar-fill {
       height: 100%;
       width: 0%;
@@ -89,14 +92,13 @@
       transition: width 1s ease;
       animation: glowbar 2s ease-in-out infinite alternate;
       border-radius: 10px;
+      position: relative;
       z-index: 2;
     }
-
     @keyframes glowbar {
       from { filter: brightness(1); }
       to { filter: brightness(1.5); }
     }
-
     .poster-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -107,7 +109,6 @@
       position: relative;
       z-index: 2;
     }
-
     .poster {
       position: relative;
       width: 100%;
@@ -119,14 +120,13 @@
       box-shadow: 0 0 10px #00ffff33;
       cursor: pointer;
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(0, 255, 255, 0.3);
       transition: box-shadow 0.3s ease;
     }
-
     .poster:hover {
       box-shadow: 0 0 20px #00ffffaa;
     }
-
     .stamp {
       position: absolute;
       top: 0; left: 0;
@@ -136,34 +136,39 @@
       animation: pop 0.5s ease;
       filter: drop-shadow(0 0 4px #00ffff);
     }
-
     @keyframes pop {
       0% { transform: scale(0.2); opacity: 0; filter: brightness(2); }
       80% { transform: scale(1.2); opacity: 1; filter: brightness(1.5); }
       100% { transform: scale(1); filter: brightness(1); }
     }
-
-    #completeBanner {
-      background: rgba(0, 255, 200, 0.2);
-      border: 2px solid #00ffff;
+    #completeBanner, #perfectBanner {
       padding: 16px;
       border-radius: 12px;
       margin: 20px auto;
       text-align: center;
       font-size: 1.3rem;
-      box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff66;
-      text-shadow: 0 0 5px #00ffff;
-      max-width: 90%;
       animation: glow 2s ease-in-out infinite alternate;
+      max-width: 90%;
       position: relative;
       z-index: 2;
     }
-
+    #completeBanner {
+      background: rgba(0, 255, 200, 0.2);
+      border: 2px solid #00ffff;
+      box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff66;
+      text-shadow: 0 0 5px #00ffff;
+    }
+    #perfectBanner {
+      background: rgba(255, 215, 0, 0.3);
+      border: 2px solid gold;
+      box-shadow: 0 0 30px gold, 0 0 60px #ffea00aa;
+      text-shadow: 0 0 8px gold;
+      font-size: 1.4rem;
+    }
     @keyframes glow {
       from { box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff66; }
       to { box-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff99; }
     }
-
     .modal {
       display: none;
       position: fixed;
@@ -174,14 +179,41 @@
       justify-content: center;
       align-items: center;
     }
-
     .modal img {
       max-height: 90vh;
       max-width: 90vw;
       box-shadow: 0 0 20px #00ffff;
       border-radius: 10px;
     }
-
+    body.glitch-mode {
+      position: relative;
+      overflow: hidden;
+    }
+    body.glitch-mode::before,
+    body.glitch-mode::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: inherit;
+      mix-blend-mode: screen;
+      opacity: 0.15;
+      pointer-events: none;
+      animation: glitch-flicker 2s infinite;
+      z-index: 99;
+    }
+    body.glitch-mode::after {
+      animation-delay: 1s;
+      opacity: 0.2;
+    }
+    @keyframes glitch-flicker {
+      0% { clip-path: inset(0 0 100% 0); transform: translate(0); }
+      10% { clip-path: inset(10% 0 80% 0); transform: translate(-5px, -5px); }
+      20% { clip-path: inset(80% 0 10% 0); transform: translate(5px, 5px); }
+      30% { clip-path: inset(10% 0 80% 0); transform: translate(-5px, 0); }
+      40% { clip-path: inset(0 0 100% 0); transform: translate(0); }
+      100% { clip-path: inset(0 0 100% 0); transform: translate(0); }
+    }
     @media (max-width: 480px) {
       h1 { font-size: 1.5rem; }
       .progress-bar { height: 16px; }
@@ -193,32 +225,44 @@
   </style>
 </head>
 <body>
-  <h1>スタンプラリー進捗</h1>
+  <h1 id="pageTitle">スタンプラリー進捗</h1>
   <div class="progress-bar"><div class="progress-bar-fill" id="progressFill"></div></div>
   <div class="poster-grid" id="posterGrid"></div>
-  <div id="completeBanner" style="display: none;">🎉 全スタンプコンプリート！スタッフに見せてね 🎉</div>
-
-  <div class="modal" id="imageModal" onclick="this.style.display='none'">
-    <img id="modalImage" src="" alt="拡大画像" />
-  </div>
+  <div id="completeBanner" style="display: none;">🎉 全ポスターコンプリート！スタッフに見せてね 🎉</div>
+  <div id="perfectBanner" style="display: none;">🏆 パーフェクトコンプリート達成！おめでとう！ 🏆</div>
+  <div class="modal" id="imageModal" onclick="this.style.display='none'"><img id="modalImage" src="" alt="拡大画像" /></div>
 
   <script>
     const posterList = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
-    const grid = document.getElementById("posterGrid");
+    const secretPosterList = ["J"];
 
-    // 受け取ったIDでスタンプを保存
     const urlParams = new URLSearchParams(window.location.search);
     const posterId = urlParams.get("id")?.toUpperCase();
-    if (posterId && posterList.includes(posterId)) {
+    const secretMode = urlParams.get("secret") === "1";
+    const secretToken = localStorage.getItem("gyumax_seal_access");
+
+    if (secretMode && secretToken !== "1") {
+      window.location.href = "index.html"; // 不正アクセス時
+    }
+
+    const allPosters = secretMode ? posterList.concat(secretPosterList) : posterList;
+
+    if (posterId && allPosters.includes(posterId)) {
       const key = `gyumax_${posterId}`;
       if (!localStorage.getItem(key)) {
         localStorage.setItem(key, "1");
+        if (posterId === "J") {
+          document.body.classList.add("glitch-mode");
+          document.getElementById("pageTitle").classList.add("glitch-title");
+        }
       }
+      localStorage.removeItem("gyumax_seal_access");
     }
 
-    // スタンプ描画
-    let count = 0;
-    posterList.forEach(id => {
+    const grid = document.getElementById("posterGrid");
+    let count = 0, secretCount = 0;
+
+    allPosters.forEach(id => {
       const used = localStorage.getItem(`gyumax_${id}`);
       const div = document.createElement("div");
       div.className = "poster";
@@ -234,20 +278,24 @@
         const stamp = document.createElement("div");
         stamp.className = "stamp";
         div.appendChild(stamp);
-        count++;
+        if (secretPosterList.includes(id)) secretCount++;
+        else count++;
       }
       grid.appendChild(div);
     });
 
-    // 進捗率
     const progress = Math.floor((count / posterList.length) * 100);
     document.getElementById("progressFill").style.width = progress + "%";
 
-    // コンプリートチェック
     const allCollected = posterList.every(id => localStorage.getItem(`gyumax_${id}`));
     if (allCollected) {
       document.getElementById("completeBanner").style.display = "block";
       document.body.classList.add("complete");
+    }
+
+    const allPerfect = allCollected && secretPosterList.every(id => localStorage.getItem(`gyumax_${id}`));
+    if (allPerfect) {
+      document.getElementById("perfectBanner").style.display = "block";
     }
   </script>
 </body>
