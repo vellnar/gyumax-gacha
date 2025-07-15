@@ -5,41 +5,103 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>アクセスエラー</title>
 <style>
-  body {
-    margin: 0;
-    padding: 0;
+  html, body {
+    margin: 0; padding: 0;
+    height: 100vh;
+    overflow: hidden;
     background: #000;
     color: #fff;
     font-family: 'Segoe UI', sans-serif;
-    overflow: hidden;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    position: relative;
   }
 
+  /* 画面揺れ 軽め */
+  @keyframes shake-light {
+    0% { transform: translate(1px, 1px); }
+    25% { transform: translate(-1px, 0); }
+    50% { transform: translate(1px, -1px); }
+    75% { transform: translate(0, 1px); }
+    100% { transform: translate(-1px, 0); }
+  }
+
+  /* 画面揺れ 強め */
+  @keyframes shake-strong {
+    0% { transform: translate(4px, 4px) rotate(1deg); }
+    25% { transform: translate(-4px, 0) rotate(-1deg); }
+    50% { transform: translate(4px, -4px) rotate(1deg); }
+    75% { transform: translate(0, 4px) rotate(-1deg); }
+    100% { transform: translate(-4px, 0) rotate(1deg); }
+  }
+
+  body.shake-light {
+    animation: shake-light 0.1s infinite;
+  }
+
+  body.shake-strong {
+    animation: shake-strong 0.07s infinite;
+  }
+
+  /* 魔法陣（通常） */
   .magic-circle {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 90vmin;
-    height: 90vmin;
+    top: 50%; left: 50%;
+    width: 90vmin; height: 90vmin;
     background: url("SISTIVALmagic.png") no-repeat center center;
     background-size: contain;
     transform: translate(-50%, -50%);
     opacity: 0.12;
     filter: brightness(1.2) drop-shadow(0 0 15px #00ff99) drop-shadow(0 0 40px #00ffcc);
-    animation: rotate-slow 40s linear infinite;
+    animation: rotate 40s linear infinite;
     z-index: 0;
+    transition: filter 0.5s ease, opacity 0.5s ease;
   }
 
-  @keyframes rotate-slow {
+  /* 魔法陣 光量強化 */
+  .magic-circle.bright {
+    opacity: 0.3;
+    filter: brightness(3) drop-shadow(0 0 30px #00ff99) drop-shadow(0 0 70px #00ffcc);
+  }
+
+  /* 宇宙背景 */
+  body.cosmos {
+    background: url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1920&q=80") no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  /* グリッチエフェクト */
+  body.glitch {
+    position: relative;
+    overflow: hidden;
+  }
+  body.glitch::before,
+  body.glitch::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: inherit;
+    mix-blend-mode: screen;
+    opacity: 0.15;
+    pointer-events: none;
+    animation: glitch-anim 2s infinite;
+  }
+  body.glitch::after {
+    animation-delay: 1s;
+    opacity: 0.2;
+  }
+  @keyframes glitch-anim {
+    0% { clip-path: inset(0 0 100% 0); transform: translate(0); }
+    10% { clip-path: inset(10% 0 80% 0); transform: translate(-5px, -5px); }
+    20% { clip-path: inset(80% 0 10% 0); transform: translate(5px, 5px); }
+    30% { clip-path: inset(10% 0 80% 0); transform: translate(-5px, 0); }
+    40% { clip-path: inset(0 0 100% 0); transform: translate(0); }
+    100% { clip-path: inset(0 0 100% 0); transform: translate(0); }
+  }
+
+  @keyframes rotate {
     from { transform: translate(-50%, -50%) rotate(0deg); }
-    to   { transform: translate(-50%, -50%) rotate(360deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
   }
 
+  /* パーティクル */
   .particles {
     position: absolute;
     width: 100%;
@@ -48,7 +110,6 @@
     z-index: 0;
     pointer-events: none;
   }
-
   .particle {
     position: absolute;
     bottom: -10px;
@@ -58,35 +119,30 @@
     filter: drop-shadow(0 0 4px #00ffcc);
     animation: rise 6s linear infinite;
   }
-
   @keyframes rise {
-    0% {
-      transform: translateY(0) scale(1);
-      opacity: 0.6;
-    }
-    100% {
-      transform: translateY(-110vh) scale(0.8);
-      opacity: 0;
-    }
+    0% { transform: translateY(0) scale(1); opacity: 0.6; }
+    100% { transform: translateY(-110vh) scale(0.8); opacity: 0; }
   }
 
+  /* コンテンツ */
   .content {
-    z-index: 1;
+    z-index: 2;
+    position: relative;
     text-align: center;
+    padding: 1em;
   }
-
   h1 {
     font-size: 2rem;
     color: #00ffaa;
     text-shadow: 0 0 6px #00ffaa;
+    margin-bottom: 1em;
   }
-
-  p {
+  .msg {
     font-size: 1.1rem;
     color: #ccc;
-    margin: 1em 0;
+    margin-bottom: 1.5em;
+    min-height: 3em;
   }
-
   .btn {
     background: transparent;
     border: 2px solid #00ffaa;
@@ -96,9 +152,14 @@
     border-radius: 6px;
     text-decoration: none;
     transition: 0.3s;
+    cursor: pointer;
   }
-
-  .btn:hover {
+  .btn.disabled {
+    pointer-events: none;
+    opacity: 0.3;
+    cursor: default;
+  }
+  .btn.enabled:hover {
     background-color: #00ffaa22;
   }
 </style>
@@ -109,25 +170,113 @@
 
   <div class="content">
     <h1>アクセス拒否</h1>
-    <p>"すまない、ここに来られるのは想定外だ。早く帰るといい。"</p>
-    <a href="index.html" class="btn">元居た場所に戻る</a>
+    <p class="msg" id="msg"></p>
+    <a href="index.html" id="backBtn" class="btn disabled">戻る</a>
   </div>
 
-  <script>
-    const container = document.getElementById('particles');
-    const count = 35; // ここで数を調整（スマホなら30〜40が限度）
+<script>
+  // === 訪問回数管理 ===
+  const ACCESS_KEY = "gyumax_access_error_count";
+  let count = parseInt(localStorage.getItem(ACCESS_KEY) || "0", 10);
+  count++;
+  localStorage.setItem(ACCESS_KEY, count);
 
-    for (let i = 0; i < count; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      const size = Math.random() * 6 + 2; // 2px〜8px
-      p.style.width = `${size}px`;
-      p.style.height = `${size}px`;
-      p.style.left = `${Math.random() * 100}%`;
-      p.style.animationDuration = `${4 + Math.random() * 3}s`;
-      p.style.animationDelay = `${Math.random() * 4}s`;
-      container.appendChild(p);
+  // 各種要素取得
+  const body = document.body;
+  const magicCircle = document.querySelector(".magic-circle");
+  const msg = document.getElementById("msg");
+  const backBtn = document.getElementById("backBtn");
+  const particles = document.getElementById("particles");
+
+  // パーティクル生成
+  function createParticles(num=35){
+    for(let i=0; i<num; i++){
+      const p = document.createElement("div");
+      p.className = "particle";
+      const size = Math.random()*6+2;
+      p.style.width = size + "px";
+      p.style.height = size + "px";
+      p.style.left = (Math.random()*100) + "%";
+      p.style.animationDuration = (4 + Math.random()*3) + "s";
+      p.style.animationDelay = (Math.random()*4) + "s";
+      particles.appendChild(p);
     }
-  </script>
+  }
+  createParticles();
+
+  // UIリセット関数
+  function resetUI(){
+    body.className = "";
+    magicCircle.classList.remove("bright");
+    body.classList.remove("cosmos");
+    body.classList.remove("glitch");
+    backBtn.classList.remove("enabled");
+    backBtn.classList.add("disabled");
+    backBtn.textContent = "戻る";
+  }
+
+  // ボタンを有効化する関数
+  function enableButton(){
+    backBtn.classList.remove("disabled");
+    backBtn.classList.add("enabled");
+  }
+
+  // ボタンを無効化する関数
+  function disableButton(){
+    backBtn.classList.remove("enabled");
+    backBtn.classList.add("disabled");
+  }
+
+  // 5段階フェーズ処理
+  async function phaseHandler(cnt){
+    resetUI();
+    switch(cnt){
+      case 1:
+        // 1回目：メッセージのみ
+        msg.textContent = "すまない、ここに来られるのは想定外だ。早く帰るといい。";
+        enableButton();
+        break;
+
+      case 2:
+        // 2回目：軽い揺れ＋メッセージ
+        msg.textContent = "時空の歪みを検知した。君が来たせいで均衡が崩れたんだ。まったく";
+        body.classList.add("shake-light");
+        enableButton();
+        break;
+
+      case 3:
+        // 3回目：強い揺れ＋ボタン破損→5秒後に復活＋メッセージ
+        msg.textContent = "警告！戻るボタンは一時的に使えません。しばらくお待ちください…";
+        body.classList.add("shake-strong");
+        disableButton();
+        await new Promise(r => setTimeout(r, 5000));
+        msg.textContent = "なんとかボタンは戻した！君は早く戻れ！";
+        enableButton();
+        break;
+
+      case 4:
+        // 4回目：3回目揺れ維持＋魔法陣光量UP＋メッセージ
+        msg.textContent = "…流石に限界だ。これ以上抑えておけそうにない。";
+        body.classList.add("shake-strong");
+        magicCircle.classList.add("bright");
+        enableButton();
+        break;
+
+      case 5:
+        // 5回目：宇宙背景＋グリッチ＋メッセージ＋ボタン有効
+        msg.textContent = "外世界からの視線を感じる…";
+        body.classList.add("cosmos");
+        body.classList.add("glitch");
+        enableButton();
+        break;
+
+      default:
+        // 6回目以上は封鎖ページにリダイレクト
+        window.location.href = "seal.html";
+    }
+  }
+
+  phaseHandler(count);
+</script>
 </body>
 </html>
