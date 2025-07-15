@@ -137,7 +137,19 @@
 
   <a href="#" class="btn disabled">戻る</a>
 
-  <!-- シークレットスタンプ取得ボタン（意味深） -->
-  <a href="stamp.html?secret=1" class="btn secret" title="何かが始まる…">シークレットスタンプを取得</a>
+  <!-- シークレットスタンプ取得ボタン -->
+  <button class="btn secret" onclick="acquireSecret()">シークレットスタンプを取得</button>
+
+  <script>
+    function acquireSecret() {
+      // トークンを保存
+      localStorage.setItem("gyumax_seal_access", "1");
+
+      // 数秒後にスタンプページへ遷移
+      setTimeout(() => {
+        location.href = "stamp.html?secret=1&id=J";
+      }, 300); // 演出を加えるならここで調整
+    }
+  </script>
 </body>
 </html>
