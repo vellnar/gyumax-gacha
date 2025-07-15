@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>スタンプラリー進捗</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
@@ -27,28 +25,22 @@
       position: relative;
     }
 
-    /* 背景画像（固定位置） */
     body::before {
       content: "";
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: url("images/glass_logo.png") center center / cover no-repeat;
       z-index: 0;
       opacity: 1;
       pointer-events: none;
     }
 
-    /* 中心から脈打つ光 */
     body::after {
       content: "";
       position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 600px;
-      height: 600px;
+      top: 50%; left: 50%;
+      width: 600px; height: 600px;
       background: radial-gradient(circle, rgba(0,255,255,0.25) 0%, transparent 70%);
       transform: translate(-50%, -50%);
       animation: pulseLight 2.5s ease-in-out infinite;
@@ -88,7 +80,6 @@
       position: relative;
       z-index: 2;
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
 
     .progress-bar-fill {
@@ -98,7 +89,6 @@
       transition: width 1s ease;
       animation: glowbar 2s ease-in-out infinite alternate;
       border-radius: 10px;
-      position: relative;
       z-index: 2;
     }
 
@@ -129,7 +119,6 @@
       box-shadow: 0 0 10px #00ffff33;
       cursor: pointer;
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(0, 255, 255, 0.3);
       transition: box-shadow 0.3s ease;
     }
@@ -140,10 +129,8 @@
 
     .stamp {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: url("images/stamp.png") center center no-repeat;
       background-size: contain;
       animation: pop 0.5s ease;
@@ -181,10 +168,8 @@
       display: none;
       position: fixed;
       z-index: 99;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
       background-color: rgba(0, 0, 0, 0.9);
       justify-content: center;
       align-items: center;
@@ -198,12 +183,8 @@
     }
 
     @media (max-width: 480px) {
-      h1 {
-        font-size: 1.5rem;
-      }
-      .progress-bar {
-        height: 16px;
-      }
+      h1 { font-size: 1.5rem; }
+      .progress-bar { height: 16px; }
       .poster-grid {
         grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
         gap: 12px;
@@ -224,8 +205,19 @@
   <script>
     const posterList = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
     const grid = document.getElementById("posterGrid");
-    let count = 0;
 
+    // 受け取ったIDでスタンプを保存
+    const urlParams = new URLSearchParams(window.location.search);
+    const posterId = urlParams.get("id")?.toUpperCase();
+    if (posterId && posterList.includes(posterId)) {
+      const key = `gyumax_${posterId}`;
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, "1");
+      }
+    }
+
+    // スタンプ描画
+    let count = 0;
     posterList.forEach(id => {
       const used = localStorage.getItem(`gyumax_${id}`);
       const div = document.createElement("div");
@@ -247,9 +239,11 @@
       grid.appendChild(div);
     });
 
+    // 進捗率
     const progress = Math.floor((count / posterList.length) * 100);
     document.getElementById("progressFill").style.width = progress + "%";
 
+    // コンプリートチェック
     const allCollected = posterList.every(id => localStorage.getItem(`gyumax_${id}`));
     if (allCollected) {
       document.getElementById("completeBanner").style.display = "block";
