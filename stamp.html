@@ -4,20 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>スタンプラリー進捗</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     html, body {
-      margin: 0; padding: 0; height: 100%; overflow-x: hidden;
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Share Tech Mono', monospace;
+      color: #cceeff;
+      background: #001a26;
+      overflow-x: hidden;
     }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      color: #cceeff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
-      background: #001a26;
       position: relative;
     }
     body::before {
@@ -30,43 +32,43 @@
       opacity: 1;
       pointer-events: none;
     }
-    body::after {
+
+    /* ----- ノイズ背景 ----- */
+    body.glitch-mode::after {
       content: "";
       position: fixed;
-      top: 50%; left: 50%;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(0,255,255,0.25) 0%, transparent 70%);
-      transform: translate(-50%, -50%);
-      animation: pulseLight 2.5s ease-in-out infinite;
-      z-index: 1;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 0, 0, 0.05),
+        rgba(255, 0, 0, 0.05) 1px,
+        rgba(0, 0, 0, 0.02) 2px
+      );
+      mix-blend-mode: overlay;
+      animation: glitchNoise 1.2s steps(2, end) infinite;
+      z-index: 2;
       pointer-events: none;
-      filter: blur(2px);
     }
-    body.complete::after {
-      animation-duration: 1.2s;
-      background: radial-gradient(circle, rgba(0,255,255,0.5) 0%, transparent 70%);
-      filter: blur(4px) drop-shadow(0 0 15px #00ffff);
-    }
-
-    @keyframes pulseLight {
-      0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
-      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    @keyframes glitchNoise {
+      0%, 100% { clip-path: inset(0 0 100% 0); }
+      25% { clip-path: inset(30% 0 30% 0); }
+      50% { clip-path: inset(60% 0 10% 0); }
+      75% { clip-path: inset(10% 0 60% 0); }
     }
 
     h1 {
       margin-top: 40px;
       font-size: 2rem;
       text-shadow: 0 0 10px #00ffff;
-      z-index: 2;
       position: relative;
+      z-index: 3;
     }
-
     h1.glitch-title {
-      animation: text-glitch 1.5s infinite;
-      color: #00ffff;
-      text-shadow: 2px 0 #00f, -2px 0 #f0f, 0 2px #0ff;
+      animation: text-glitch 2s infinite;
+      color: #ff3333;
+      text-shadow: 2px 0 #000, -2px 0 #f00, 0 2px #0ff;
     }
-
     @keyframes text-glitch {
       0% { transform: translate(0); }
       20% { transform: translate(1px, -1px); }
@@ -85,22 +87,20 @@
       overflow: hidden;
       margin: 20px auto;
       box-shadow: 0 0 10px #00ffff66;
-      z-index: 2;
-      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 3;
     }
-
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #00ffff, #0066ff);
-      transition: width 1s ease;
-      animation: glowbar 2s ease-in-out infinite alternate;
+      background: linear-gradient(90deg, #00ffff, #ff0033);
+      animation: glowbar 1s ease-in-out infinite alternate;
       border-radius: 10px;
+      transition: width 0.8s ease;
     }
-
     @keyframes glowbar {
-      from { filter: brightness(1); }
-      to { filter: brightness(1.5); }
+      from { filter: brightness(0.8); }
+      to { filter: brightness(1.6); }
     }
 
     .poster-grid {
@@ -110,9 +110,9 @@
       padding: 20px;
       width: 95%;
       max-width: 720px;
-      z-index: 2;
+      position: relative;
+      z-index: 3;
     }
-
     .poster {
       position: relative;
       width: 100%;
@@ -122,16 +122,8 @@
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 0 10px #00ffff33;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
       border: 1px solid rgba(0, 255, 255, 0.3);
-      transition: box-shadow 0.3s ease;
     }
-
-    .poster:hover {
-      box-shadow: 0 0 20px #00ffffaa;
-    }
-
     .stamp {
       position: absolute;
       top: 0; left: 0;
@@ -141,43 +133,29 @@
       animation: pop 0.5s ease;
       filter: drop-shadow(0 0 4px #00ffff);
     }
-
     @keyframes pop {
-      0% { transform: scale(0.2); opacity: 0; filter: brightness(2); }
-      80% { transform: scale(1.2); opacity: 1; filter: brightness(1.5); }
-      100% { transform: scale(1); filter: brightness(1); }
+      0% { transform: scale(0.2); opacity: 0; }
+      80% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
     }
 
     #completeBanner, #perfectBanner {
-      padding: 16px;
-      border-radius: 12px;
       margin: 20px auto;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 1.2rem;
       text-align: center;
-      font-size: 1.3rem;
-      animation: glow 2s ease-in-out infinite alternate;
-      max-width: 90%;
-      position: relative;
-      z-index: 2;
+      z-index: 3;
     }
-
     #completeBanner {
-      background: rgba(0, 255, 200, 0.2);
+      background: rgba(0, 255, 200, 0.15);
       border: 2px solid #00ffff;
-      box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff66;
-      text-shadow: 0 0 5px #00ffff;
+      text-shadow: 0 0 6px #00ffff;
     }
-
     #perfectBanner {
-      background: rgba(255, 215, 0, 0.3);
-      border: 2px solid gold;
-      box-shadow: 0 0 30px gold, 0 0 60px #ffea00aa;
-      text-shadow: 0 0 8px gold;
-      font-size: 1.4rem;
-    }
-
-    @keyframes glow {
-      from { box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff66; }
-      to { box-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff99; }
+      background: rgba(255, 0, 0, 0.2);
+      border: 2px solid red;
+      text-shadow: 0 0 6px red;
     }
 
     .modal {
@@ -190,38 +168,16 @@
       justify-content: center;
       align-items: center;
     }
-
     .modal img {
       max-height: 90vh;
       max-width: 90vw;
-      box-shadow: 0 0 20px #00ffff;
       border-radius: 10px;
     }
 
-    body.glitch-mode::before,
-    body.glitch-mode::after {
-      animation: glitch-flicker 1.5s infinite;
-      mix-blend-mode: screen;
-      opacity: 0.15;
-      z-index: 99;
-    }
-
-    @keyframes glitch-flicker {
-      0% { clip-path: inset(0 0 100% 0); transform: translate(0); }
-      10% { clip-path: inset(10% 0 80% 0); transform: translate(-5px, -5px); }
-      20% { clip-path: inset(80% 0 10% 0); transform: translate(5px, 5px); }
-      30% { clip-path: inset(10% 0 80% 0); transform: translate(-5px, 0); }
-      40% { clip-path: inset(0 0 100% 0); transform: translate(0); }
-      100% { clip-path: inset(0 0 100% 0); transform: translate(0); }
-    }
-
     @media (max-width: 480px) {
-      h1 { font-size: 1.5rem; }
+      h1 { font-size: 1.4rem; }
       .progress-bar { height: 16px; }
-      .poster-grid {
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-        gap: 12px;
-      }
+      .poster-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
     }
   </style>
 </head>
@@ -229,38 +185,37 @@
   <h1 id="pageTitle">スタンプラリー進捗</h1>
   <div class="progress-bar"><div class="progress-bar-fill" id="progressFill"></div></div>
   <div class="poster-grid" id="posterGrid"></div>
-  <div id="completeBanner" style="display: none;">🎉 全ポスターコンプリート！スタッフに見せてね 🎉</div>
-  <div id="perfectBanner" style="display: none;">🏆 パーフェクトコンプリート達成！おめでとう！ 🏆</div>
-  <div class="modal" id="imageModal" onclick="this.style.display='none'"><img id="modalImage" src="" alt="拡大画像" /></div>
+  <div id="completeBanner" style="display:none;">🎉 全ポスターコンプリート 🎉</div>
+  <div id="perfectBanner" style="display:none;">💀 シークレットまで完全制覇 💀</div>
+
+  <div class="modal" id="imageModal" onclick="this.style.display='none'">
+    <img id="modalImage" src="" alt="拡大画像" />
+  </div>
 
   <script>
     const posterList = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
     const secretPosterList = ["J"];
-    const urlParams = new URLSearchParams(window.location.search);
-    const posterId = urlParams.get("id")?.toUpperCase();
-    const secretMode = urlParams.get("secret") === "1";
-    const secretToken = localStorage.getItem("gyumax_seal_access");
 
-    // 不正アクセス防止
-    if (secretMode && secretToken !== "1") {
-      window.location.href = "index.html";
+    const urlParams = new URLSearchParams(location.search);
+    const posterId = urlParams.get("id")?.toUpperCase();
+    const secretMode = urlParams.get("secret") === "true";
+    const token = localStorage.getItem("gyumax_seal_access");
+
+    if (secretMode && token !== "1") {
+      location.href = "index.html";
     }
 
-    const allPosters = secretMode ? posterList.concat(secretPosterList) : posterList;
+    const allPosters = secretMode ? [...posterList, ...secretPosterList] : [...posterList];
 
     if (posterId && allPosters.includes(posterId)) {
       const key = `gyumax_${posterId}`;
-      const isNew = !localStorage.getItem(key);
-      if (isNew) {
+      if (!localStorage.getItem(key)) {
         localStorage.setItem(key, "1");
+        if (posterId === "J") {
+          document.body.classList.add("glitch-mode");
+          document.getElementById("pageTitle").classList.add("glitch-title");
+        }
       }
-
-      // Jなら演出を常に出す
-      if (posterId === "J") {
-        document.body.classList.add("glitch-mode");
-        document.getElementById("pageTitle").classList.add("glitch-title");
-      }
-
       localStorage.removeItem("gyumax_seal_access");
     }
 
@@ -271,13 +226,11 @@
       const used = localStorage.getItem(`gyumax_${id}`);
       const div = document.createElement("div");
       div.className = "poster";
-      const imgPath = `images/poster_${id}.png`;
-      div.style.backgroundImage = `url('${imgPath}')`;
+      const img = `images/poster_${id}.png`;
+      div.style.backgroundImage = `url('${img}')`;
       div.onclick = () => {
-        const modal = document.getElementById("imageModal");
-        const modalImg = document.getElementById("modalImage");
-        modalImg.src = imgPath;
-        modal.style.display = "flex";
+        document.getElementById("modalImage").src = img;
+        document.getElementById("imageModal").style.display = "flex";
       };
       if (used) {
         const stamp = document.createElement("div");
@@ -289,19 +242,13 @@
       grid.appendChild(div);
     });
 
-    const progress = Math.floor((count / posterList.length) * 100);
-    document.getElementById("progressFill").style.width = progress + "%";
+    document.getElementById("progressFill").style.width = `${Math.floor((count / posterList.length) * 100)}%`;
 
     const allCollected = posterList.every(id => localStorage.getItem(`gyumax_${id}`));
-    if (allCollected) {
-      document.getElementById("completeBanner").style.display = "block";
-      document.body.classList.add("complete");
-    }
-
     const allPerfect = allCollected && secretPosterList.every(id => localStorage.getItem(`gyumax_${id}`));
-    if (allPerfect) {
-      document.getElementById("perfectBanner").style.display = "block";
-    }
+
+    if (allCollected) document.getElementById("completeBanner").style.display = "block";
+    if (allPerfect) document.getElementById("perfectBanner").style.display = "block";
   </script>
 </body>
 </html>
