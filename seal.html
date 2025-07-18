@@ -1,155 +1,247 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>アクセス封鎖</title>
-<style>
-  html, body {
-    margin: 0; padding: 0;
-    height: 100vh;
-    background: #0a0a0a;
-    color: #ff4444;
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    text-align: center;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>アクセス封鎖</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      height: 100vh;
+      background: #0a0a0a;
+      color: #ff4444;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      text-align: center;
+      position: relative;
+    }
 
-  h1 {
-    font-size: 2.2rem;
-    margin-bottom: 0.5em;
-    text-shadow: 0 0 20px #ff4444;
-  }
+    canvas#noiseCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
 
-  p {
-    font-size: 1.2rem;
-    margin-bottom: 1.5em;
-    padding: 0 1em;
-    text-shadow: 0 0 10px #ff6666;
-  }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5em;
+      text-shadow: 0 0 20px #ff4444;
+      z-index: 1;
+    }
 
-  .glitch-text {
-    position: relative;
-    font-weight: bold;
-    font-size: 2rem;
-    color: #ff4444;
-    animation: glitch 2s infinite;
-  }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5em;
+      padding: 0 1em;
+      text-shadow: 0 0 10px #ff6666;
+      z-index: 1;
+    }
 
-  @keyframes glitch {
-    0% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffea; }
-    20% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffea; }
-    40% { text-shadow: 2px 2px #ff0000, -2px -2px #00ffea; }
-    60% { text-shadow: -2px -2px #ff0000, 2px 2px #00ffea; }
-    80% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffea; }
-    100% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffea; }
-  }
+    .glitch-text {
+      position: relative;
+      font-weight: bold;
+      font-size: 2rem;
+      color: #ff4444;
+      animation: glitch 2s infinite;
+      z-index: 1;
+    }
 
-  .btn {
-    background: transparent;
-    border: 2px solid #ff4444;
-    color: #ff4444;
-    padding: 12px 20px;
-    font-size: 1.1rem;
-    border-radius: 6px;
-    text-decoration: none;
-    cursor: pointer;
-    margin: 0.5em;
-    transition: background-color 0.3s, color 0.3s;
-    width: 80%;
-    max-width: 300px;
-  }
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffea; }
+      20% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffea; }
+      40% { text-shadow: 2px 2px #ff0000, -2px -2px #00ffea; }
+      60% { text-shadow: -2px -2px #ff0000, 2px 2px #00ffea; }
+      80% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffea; }
+      100% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffea; }
+    }
 
-  .btn:hover {
-    background-color: #ff444422;
-    color: #ff6666;
-  }
+    .btn {
+      background: transparent;
+      border: 2px solid #ff4444;
+      color: #ff4444;
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      margin: 0.5em;
+      transition: background-color 0.3s, color 0.3s;
+      width: 80%;
+      max-width: 300px;
+      z-index: 1;
+    }
 
-  .btn.disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-    pointer-events: none;
-  }
+    .btn:hover {
+      background-color: #ff444422;
+      color: #ff6666;
+    }
 
-  .btn.secret {
-    position: relative;
-    border-color: #ff0000;
-    color: #ff0000;
-    animation: pulseDanger 2s infinite;
-  }
+    .btn.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+      pointer-events: none;
+    }
 
-  .btn.secret::before {
-    content: "※ 押すべきではない";
-    position: absolute;
-    top: -1.5em;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.8rem;
-    color: #ff8888;
-    text-shadow: 0 0 4px #ff0000;
-    pointer-events: none;
-  }
+    .btn.secret {
+      position: relative;
+      border-color: #ff0000;
+      color: #ff0000;
+      animation: pulseDanger 2s infinite;
+    }
 
-  .btn.secret:hover {
-    animation: pulseDanger 1s infinite, hoverGlitch 0.3s infinite;
-    color: #ff6666;
-    background-color: #ff000022;
-  }
+    .btn.secret::before {
+      content: "※ 押すべきではない";
+      position: absolute;
+      top: -1.5em;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: #ff8888;
+      text-shadow: 0 0 4px #ff0000;
+      pointer-events: none;
+    }
 
-  @keyframes pulseDanger {
-    0% { box-shadow: 0 0 8px #ff4444aa; transform: scale(1); }
-    50% { box-shadow: 0 0 20px #ff4444cc; transform: scale(1.05); }
-    100% { box-shadow: 0 0 8px #ff4444aa; transform: scale(1); }
-  }
+    .btn.secret:hover {
+      animation: pulseDanger 1s infinite, hoverGlitch 0.3s infinite;
+      color: #ff6666;
+      background-color: #ff000022;
+    }
 
-  @keyframes hoverGlitch {
-    0%, 100% { transform: none; }
-    20% { transform: translateX(-1px); }
-    40% { transform: translateX(1px); }
-    60% { transform: translateX(-1px); }
-    80% { transform: translateX(1px); }
-  }
+    @keyframes pulseDanger {
+      0% { box-shadow: 0 0 8px #ff4444aa; transform: scale(1); }
+      50% { box-shadow: 0 0 20px #ff4444cc; transform: scale(1.05); }
+      100% { box-shadow: 0 0 8px #ff4444aa; transform: scale(1); }
+    }
 
-  .subtitle {
-    margin-top: 1em;
-    font-size: 0.9rem;
-    color: #aa0000;
-    font-style: italic;
-  }
+    @keyframes hoverGlitch {
+      0%, 100% { transform: none; }
+      20% { transform: translateX(-1px); }
+      40% { transform: translateX(1px); }
+      60% { transform: translateX(-1px); }
+      80% { transform: translateX(1px); }
+    }
 
-  @media (max-width: 480px) {
-    h1 { font-size: 1.6rem; }
-    .glitch-text { font-size: 1.4rem; }
-    p { font-size: 1rem; }
-    .btn { font-size: 1rem; padding: 10px 16px; }
-    .btn.secret::before { font-size: 0.7rem; top: -1.2em; }
-  }
-</style>
+    .subtitle {
+      margin-top: 1em;
+      font-size: 0.9rem;
+      color: #aa0000;
+      font-style: italic;
+      z-index: 1;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.6rem; }
+      .glitch-text { font-size: 1.4rem; }
+      p { font-size: 1rem; }
+      .btn { font-size: 1rem; padding: 10px 16px; }
+      .btn.secret::before { font-size: 0.7rem; top: -1.2em; }
+    }
+  </style>
 </head>
 <body>
-  <h1 class="glitch-text">アクセス封鎖中</h1>
-  <p>あなたのアクセスはシステムにより永久に封鎖されました。</p>
-  <p class="subtitle">管理者にお問い合わせください。</p>
+  <canvas id="noiseCanvas"></canvas>
 
-  <a href="#" class="btn disabled">戻る</a>
+  <h1 class="glitch-text" id="glitchText">アクセス封鎖中</h1>
+  <p id="warningText">あなたのアクセスはシステムにより永久的に封鎖されました。</p>
+  <p class="subtitle" id="staticText">もう手遅れだ。何もかもが。</p>
 
-  <!-- シークレットスタンプ取得ボタン -->
-  <button class="btn secret" onclick="acquireSecret()">シークレットスタンプを取得</button>
+  <a href="#" class="btn disabled" id="backBtn">戻る</a>
+  <button class="btn secret" id="secretBtn" onclick="acquireSecret()">シークレットスタンプを取得</button>
 
   <script>
-    function acquireSecret() {
-      // トークンを保存
-      localStorage.setItem("gyumax_seal_access", "1");
+    // 対象要素と元テキストの配列
+    const glitchElements = [
+      { el: document.getElementById('glitchText'), original: "アクセス封鎖中" },
+      { el: document.getElementById('warningText'), original: "あなたのアクセスはシステムにより永久的に封鎖されました。" },
+      { el: document.getElementById('backBtn'), original: "戻る" },
+      { el: document.getElementById('secretBtn'), original: "シークレットスタンプを取得" },
+    ];
 
-      // 数秒後にスタンプページへ遷移
+    // グリッチ用文字候補
+    function randomGlitchText(text) {
+      const glitchChars = ["𓂀", "⟁", "⛒", "⚠", "∵", "Ξ", "҉", "𒁃", "░", "▓", "☒"];
+      return text.split('').map(char => Math.random() < 0.2 ? glitchChars[Math.floor(Math.random() * glitchChars.length)] : char).join('');
+    }
+
+    // 各要素のグリッチループ
+    function glitchElementLoop(obj) {
+      const { el, original } = obj;
+      el.textContent = randomGlitchText(original);
+      el.style.color = "#ff4444";
+      el.style.textShadow = "0 0 10px #ff4444";
+      setTimeout(() => {
+        el.textContent = original;
+        el.style.color = "#ff4444";
+        el.style.textShadow = "0 0 6px #ff4444";
+      }, 150);
+    }
+
+    // すべての対象に別々の間隔でグリッチをループ実行
+    glitchElements.forEach(obj => {
+      setInterval(() => glitchElementLoop(obj), 700 + Math.random()*300);
+    });
+
+    // シークレットスタンプ取得
+    function acquireSecret() {
+      localStorage.setItem("gyumax_seal_access", "1");
       setTimeout(() => {
         location.href = "stamp.html?secret=1&id=J";
-      }, 300); // 演出を加えるならここで調整
+      }, 300);
     }
+
+    // 赤ノイズ背景描画
+    const canvas = document.getElementById('noiseCanvas');
+    const ctx = canvas.getContext('2d');
+    let noiseRects = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function generateNoiseRects() {
+      noiseRects = [];
+      const count = 80;
+      for (let i = 0; i < count; i++) {
+        noiseRects.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          w: 10 + Math.random() * 40,
+          h: 5 + Math.random() * 20,
+          delay: Math.random() * 1000,
+          duration: 80 + Math.random() * 120,
+          next: Date.now() + Math.random() * 1000
+        });
+      }
+    }
+
+    function drawNoise() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const now = Date.now();
+      for (let rect of noiseRects) {
+        if (now > rect.next) {
+          ctx.fillStyle = '#ff000088';
+          ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+          rect.next = now + rect.delay + rect.duration;
+        }
+      }
+      requestAnimationFrame(drawNoise);
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      generateNoiseRects();
+    });
+
+    resizeCanvas();
+    generateNoiseRects();
+    requestAnimationFrame(drawNoise);
   </script>
 </body>
 </html>
