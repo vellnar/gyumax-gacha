@@ -41,7 +41,8 @@
 <script>
 (() => {
   const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get("id");
+  let id = urlParams.get("id");
+  if (id) id = id.toUpperCase();
 
   const loadingTextMap = {
     A: "奇跡を見たことはあるか？",
