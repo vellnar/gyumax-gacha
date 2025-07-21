@@ -98,6 +98,7 @@
   }
 
   const token = generateToken();
+  sessionStorage.setItem("gyumax_token", token);  // ここを追加
 
   setTimeout(() => {
     const resultStr = isAtari ? "win" : "lose";
