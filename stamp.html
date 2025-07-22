@@ -31,9 +31,12 @@
       z-index: 0;
       opacity: 1;
       pointer-events: none;
+      transition: background-image 1s ease;
+    }
+    body.secret-active::before {
+      background-image: url("images/secret_bg.png");
     }
 
-    /* ----- ノイズ背景 ----- */
     body.glitch-mode::after {
       content: "";
       position: fixed;
@@ -174,6 +177,19 @@
       border-radius: 10px;
     }
 
+    .toggle-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid #00ffff;
+      padding: 8px 14px;
+      border-radius: 10px;
+      z-index: 99;
+      cursor: pointer;
+    }
+
     @media (max-width: 480px) {
       h1 { font-size: 1.4rem; }
       .progress-bar { height: 16px; }
@@ -187,10 +203,8 @@
   <div class="poster-grid" id="posterGrid"></div>
   <div id="completeBanner" style="display:none;">🎉 全ポスターコンプリート 🎉</div>
   <div id="perfectBanner" style="display:none;">💀 パーフェクトコンプリート 💀</div>
-
-  <div class="modal" id="imageModal" onclick="this.style.display='none'">
-    <img id="modalImage" src="" alt="拡大画像" />
-  </div>
+  <div class="modal" id="imageModal" onclick="this.style.display='none'"><img id="modalImage" src="" alt="拡大画像" /></div>
+  <button class="toggle-btn" onclick="toggleSecretMode()">UI切り替え</button>
 
   <script>
     const posterList = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
@@ -198,12 +212,19 @@
 
     const urlParams = new URLSearchParams(location.search);
     const posterId = urlParams.get("id")?.toUpperCase();
-    const secretMode = urlParams.get("secret") === "true";
-    const token = localStorage.getItem("gyumax_seal_access");
+    let secretMode = localStorage.getItem("secretMode") === "true";
 
-    if (secretMode && token !== "1") {
-      location.href = "index.html";
+    if (urlParams.get("secret") === "true") {
+      const token = localStorage.getItem("gyumax_seal_access");
+      if (token === "1") {
+        secretMode = true;
+        localStorage.setItem("secretMode", "true");
+      } else {
+        location.href = "index.html";
+      }
     }
+
+    document.body.classList.toggle("secret-active", secretMode);
 
     const allPosters = secretMode ? [...posterList, ...secretPosterList] : [...posterList];
 
@@ -238,6 +259,8 @@
         div.appendChild(stamp);
         if (secretPosterList.includes(id)) secretCount++;
         else count++;
+      } else if (secretPosterList.includes(id)) {
+        return; // J未取得なら描画スキップ
       }
       grid.appendChild(div);
     });
@@ -249,6 +272,12 @@
 
     if (allCollected) document.getElementById("completeBanner").style.display = "block";
     if (allPerfect) document.getElementById("perfectBanner").style.display = "block";
+
+    function toggleSecretMode() {
+      secretMode = !secretMode;
+      localStorage.setItem("secretMode", secretMode);
+      location.reload();
+    }
   </script>
 </body>
 </html>
