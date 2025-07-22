@@ -276,6 +276,27 @@
   </div>
 
   <script>
+    // --- sealルート判定とシークレットモード起動処理 ---
+const fromSeal = sessionStorage.getItem("from_seal") === "true";
+if (fromSeal) {
+  // ポスターJスタンプ押す
+  localStorage.setItem("gyumax_J", "1");
+
+  // シークレット背景＆タイトルエフェクト
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.classList.add("glitch-mode");
+    document.getElementById("pageTitle").classList.add("glitch-title");
+
+    // UI切替ボタンを強制表示して secret-ui から開始
+    document.body.classList.add("secret-ui");
+    document.getElementById("uiToggleBtn").style.display = "block";
+    secretUIActive = true;
+  });
+
+  // 一回限りなので消す
+  sessionStorage.removeItem("from_seal");
+}
+
     const posterList = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
     const secretPosterList = ["J"];
 
