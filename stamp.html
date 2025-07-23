@@ -4,415 +4,172 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>スタンプラリー進捗</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0; padding: 0; height: 100%;
-      font-family: 'Share Tech Mono', monospace;
-      color: #cceeff;
-      background: #001a26;
-      overflow-x: hidden;
-      transition: background 0.5s ease;
-    }
     body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      position: relative;
+      margin: 0;
+      font-family: sans-serif;
+      background: black;
+      overflow-x: hidden;
     }
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url("images/glass_logo.png") center center / cover no-repeat;
-      z-index: 0;
-      opacity: 1;
-      pointer-events: none;
-      transition: background-image 0.5s ease;
-    }
-    body.secret-ui::before {
-      background-image: url("images/glass_logo_secret.png");
-    }
-
-    body.glitch-mode::after {
-      content: "";
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(255, 0, 0, 0.05),
-        rgba(255, 0, 0, 0.05) 1px,
-        rgba(0, 0, 0, 0.02) 2px
-      );
-      mix-blend-mode: overlay;
-      animation: glitchNoise 1.2s steps(2, end) infinite;
-      z-index: 2;
-      pointer-events: none;
-    }
-    @keyframes glitchNoise {
-      0%, 100% { clip-path: inset(0 0 100% 0); }
-      25% { clip-path: inset(30% 0 30% 0); }
-      50% { clip-path: inset(60% 0 10% 0); }
-      75% { clip-path: inset(10% 0 60% 0); }
-    }
-
-    h1 {
-      margin-top: 40px;
-      font-size: 2rem;
-      text-shadow: 0 0 10px #00ffff;
-      position: relative;
-      z-index: 3;
-    }
-    h1.glitch-title {
-      animation: text-glitch 2s infinite;
-      color: #ff3333;
-      text-shadow: 2px 0 #000, -2px 0 #f00, 0 2px #0ff;
-    }
-    @keyframes text-glitch {
-      0% { transform: translate(0); }
-      20% { transform: translate(1px, -1px); }
-      40% { transform: translate(-2px, 1px); }
-      60% { transform: translate(2px, 2px); }
-      80% { transform: translate(-1px, -2px); }
-      100% { transform: translate(0); }
-    }
-
-    .progress-bar {
-      width: 90%;
-      max-width: 600px;
-      height: 20px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 20px auto;
-      box-shadow: 0 0 10px #00ffff66;
-      position: relative;
-      z-index: 3;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #00ffff, #ff0033);
-      animation: glowbar 1s ease-in-out infinite alternate;
-      border-radius: 10px;
-      transition: width 0.8s ease;
-    }
-    @keyframes glowbar {
-      from { filter: brightness(0.8); }
-      to { filter: brightness(1.6); }
-    }
-
-    .poster-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 16px;
+    #container {
       padding: 20px;
-      width: 95%;
-      max-width: 720px;
-      position: relative;
-      z-index: 3;
+      text-align: center;
+      color: white;
     }
     .poster {
+      width: 200px;
+      margin: 10px;
+      display: inline-block;
       position: relative;
-      width: 100%;
-      padding-bottom: 141.4%;
-      background-size: cover;
-      background-position: center;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 0 10px #00ffff33;
-      border: 1px solid rgba(0, 255, 255, 0.3);
-      cursor: pointer;
-      transition: filter 0.3s ease;
+      transition: transform 0.3s ease;
     }
     .poster:hover {
-      filter: brightness(1.1);
+      transform: scale(1.05);
+      cursor: pointer;
     }
     .stamp {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url("images/stamp.png") center center no-repeat;
-      background-size: contain;
-      animation: pop 0.5s ease;
-      filter: drop-shadow(0 0 4px #00ffff);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-repeat: no-repeat;
       pointer-events: none;
     }
-    @keyframes pop {
-      0% { transform: scale(0.2); opacity: 0; }
-      80% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(1); }
+    .glow {
+      animation: glow-pulse 2s infinite;
     }
-
-    /* 揺れないブロックノイズ・グリッチ風エフェクト */
-    .poster.glitch-poster {
-      position: relative;
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 10px #00f, 0 0 20px #00f; }
+      50% { box-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }
+    }
+    #gauge-container {
+      margin-top: 30px;
+      width: 80%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
       overflow: hidden;
     }
-    .poster.glitch-poster::before,
-    .poster.glitch-poster::after {
-      content: "";
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: inherit;
-      mix-blend-mode: screen;
+    #gauge-bar {
+      height: 20px;
+      background: linear-gradient(90deg, #00f, #0ff);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    .glass-bg {
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    #lightPulse {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200vmax;
+      height: 200vmax;
+      background: radial-gradient(circle, rgba(0,123,255,0.2) 0%, transparent 70%);
+      z-index: -1;
+      animation: pulse 3s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    .secret-mode #lightPulse {
+      background: radial-gradient(circle, rgba(0,255,255,0.4) 0%, transparent 70%);
+      animation: pulse-bright 2s infinite;
+    }
+    @keyframes pulse-bright {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+    .glass-shards {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       pointer-events: none;
-      border-radius: 12px;
-      clip-path: polygon(0 2%, 100% 2%, 100% 10%, 0 10%);
-      opacity: 0.2;
-      animation-timing-function: steps(2, end);
-      animation-iteration-count: infinite;
+      z-index: -2;
     }
-    .poster.glitch-poster::before {
-      animation-name: glitchBlock1;
-      animation-duration: 1.5s;
-      filter: hue-rotate(60deg);
+    .shard {
+      position: absolute;
+      width: 10px;
+      height: 30px;
+      background: rgba(0,200,255,0.3);
+      transform: rotate(45deg);
+      animation: floatShard 8s infinite linear;
     }
-    .poster.glitch-poster::after {
-      animation-name: glitchBlock2;
-      animation-duration: 1.3s;
-      filter: hue-rotate(-60deg);
-      clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%);
-    }
-    @keyframes glitchBlock1 {
-      0%   { clip-path: polygon(0 2%, 100% 2%, 100% 10%, 0 10%); opacity: 0.2; }
-      25%  { clip-path: polygon(0 15%, 100% 15%, 100% 25%, 0 25%); opacity: 0.3; }
-      50%  { clip-path: polygon(0 50%, 100% 50%, 100% 60%, 0 60%); opacity: 0.15; }
-      75%  { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); opacity: 0.25; }
-      100% { clip-path: polygon(0 2%, 100% 2%, 100% 10%, 0 10%); opacity: 0.2; }
-    }
-    @keyframes glitchBlock2 {
-      0%   { clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%); opacity: 0.25; }
-      25%  { clip-path: polygon(0 45%, 100% 45%, 100% 55%, 0 55%); opacity: 0.15; }
-      50%  { clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%); opacity: 0.3; }
-      75%  { clip-path: polygon(0 50%, 100% 50%, 100% 60%, 0 60%); opacity: 0.2; }
-      100% { clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%); opacity: 0.25; }
-    }
-
-    #completeBanner, #perfectBanner {
-      margin: 20px auto;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 1.2rem;
-      text-align: center;
-      z-index: 3;
-    }
-    #completeBanner {
-      background: rgba(0, 255, 200, 0.15);
-      border: 2px solid #00ffff;
-      text-shadow: 0 0 6px #00ffff;
-    }
-    #perfectBanner {
-      background: rgba(255, 0, 0, 0.2);
-      border: 2px solid red;
-      text-shadow: 0 0 6px red;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 99;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0, 0, 0, 0.9);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal img {
-      max-height: 90vh;
-      max-width: 90vw;
-      border-radius: 10px;
-    }
-
-    #uiToggleBtn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 100;
-      padding: 10px 18px;
-      background: #00ffff;
-      color: #001a26;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 0 8px #00ffffaa;
-      user-select: none;
-      transition: background 0.3s ease;
-      display: none;
-    }
-    #uiToggleBtn:hover {
-      background: #00cccc;
-    }
-
-    @media (max-width: 480px) {
-      h1 { font-size: 1.4rem; }
-      .progress-bar { height: 16px; }
-      .poster-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
-      #uiToggleBtn {
-        padding: 8px 14px;
-        font-size: 0.9rem;
-      }
+    @keyframes floatShard {
+      0% { transform: translateY(0) rotate(45deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(90deg); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <h1 id="pageTitle">スタンプラリー進捗</h1>
-  <div class="progress-bar"><div class="progress-bar-fill" id="progressFill"></div></div>
-  <div class="poster-grid" id="posterGrid"></div>
-  <div id="completeBanner" style="display:none;">🎉 全ポスターコンプリート 🎉</div>
-  <div id="perfectBanner" style="display:none;">💀 パーフェクトコンプリート 💀</div>
-
-  <button id="uiToggleBtn" title="UI切り替え">通常UI ⇔ シークレットUI</button>
-
-  <div class="modal" id="imageModal" onclick="this.style.display='none'">
-    <img id="modalImage" src="" alt="拡大画像" />
+<div id="lightPulse"></div>
+<div class="glass-shards" id="shards-container"></div>
+<div id="container" class="glass-bg">
+  <h1>スタンプラリー進捗</h1>
+  <div id="posterArea"></div>
+  <div id="gauge-container">
+    <div id="gauge-bar"></div>
   </div>
+</div>
+<script>
+  const posterArea = document.getElementById("posterArea");
+  const posters = ["A","B","C","D","E","F","G","H","I"];
+  const stampPath = "stamp.png"; // スタンプ画像のパス
+  const shardContainer = document.getElementById("shards-container");
 
-  <script>
-    // --- sealルート判定とシークレットモード起動処理 ---
-const fromSeal = sessionStorage.getItem("from_seal") === "true";
-if (fromSeal) {
-  // ポスターJスタンプ押す
-  localStorage.setItem("gyumax_J", "1");
-
-  // シークレット背景＆タイトルエフェクト
-  document.addEventListener("DOMContentLoaded", () => {
-    document.body.classList.add("glitch-mode");
-    document.getElementById("pageTitle").classList.add("glitch-title");
-
-    // UI切替ボタンを強制表示して secret-ui から開始
-    document.body.classList.add("secret-ui");
-    document.getElementById("uiToggleBtn").style.display = "block";
-    secretUIActive = true;
+  const urlParams = new URLSearchParams(window.location.search);
+  const newPoster = urlParams.get("poster");
+  const isSecret = urlParams.get("secret") === "true";
+  let stamped = JSON.parse(localStorage.getItem("stampedPosters")) || [];
+  if (newPoster && posters.includes(newPoster) && !stamped.includes(newPoster)) {
+    stamped.push(newPoster);
+    localStorage.setItem("stampedPosters", JSON.stringify(stamped));
+  }
+  stamped.forEach(id => {
+    const poster = document.createElement("div");
+    poster.className = "poster glow";
+    const img = document.createElement("img");
+    img.src = `posters_${id}.png`;
+    img.style.width = "100%";
+    poster.appendChild(img);
+    const stamp = document.createElement("div");
+    stamp.className = "stamp";
+    stamp.style.backgroundImage = `url(${stampPath})`;
+    poster.appendChild(stamp);
+    posterArea.appendChild(poster);
   });
 
-  // 一回限りなので消す
-  sessionStorage.removeItem("from_seal");
-}
+  // Jの出現判定（シークレットモード）
+  if (isSecret) {
+    document.body.classList.add("secret-mode");
+    const posterJ = document.createElement("div");
+    posterJ.className = "poster glow";
+    const imgJ = document.createElement("img");
+    imgJ.src = "poster_J.png";
+    imgJ.style.width = "100%";
+    posterJ.appendChild(imgJ);
+    const stampJ = document.createElement("div");
+    stampJ.className = "stamp";
+    stampJ.style.backgroundImage = `url(${stampPath})`;
+    posterJ.appendChild(stampJ);
+    posterArea.appendChild(posterJ);
+  }
 
-    const posterList = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
-    const secretPosterList = ["J"];
-
-    const urlParams = new URLSearchParams(location.search);
-    const posterId = urlParams.get("id")?.toUpperCase();
-    const secretMode = urlParams.get("secret") === "true";
-    const token = localStorage.getItem("gyumax_seal_access");
-
-    if (secretMode && token !== "1") {
-      location.href = "index.html";
-    }
-
-    // ポスターJのスタンプ押されてる or secretModeならJも表示、UI切り替えボタンも表示
-    const hasSecretAccess = localStorage.getItem("gyumax_J") === "1" || secretMode;
-
-    // 表示ポスターリスト
-    const allPosters = hasSecretAccess ? [...posterList, ...secretPosterList] : [...posterList];
-
-    if (posterId && allPosters.includes(posterId)) {
-      const key = `gyumax_${posterId}`;
-      if (!localStorage.getItem(key)) {
-        localStorage.setItem(key, "1");
-        if (posterId === "J") {
-          document.body.classList.add("glitch-mode");
-          document.getElementById("pageTitle").classList.add("glitch-title");
-        }
-      }
-      localStorage.removeItem("gyumax_seal_access");
-    }
-
-    const grid = document.getElementById("posterGrid");
-    let count = 0, secretCount = 0;
-
-    // UI切り替えボタン要素
-    const uiToggleBtn = document.getElementById("uiToggleBtn");
-
-    // UI状態管理。初期は通常UI（false）
-    let secretUIActive = false;
-
-    // ポスター生成
-    allPosters.forEach(id => {
-      const used = localStorage.getItem(`gyumax_${id}`);
-      const div = document.createElement("div");
-      div.className = "poster";
-
-      // J以外のポスターは通常UI時はグリッチ付与、シークレットUI時は外す（視認性向上）
-      if (id !== "J" && !secretUIActive) {
-        div.classList.add("glitch-poster");
-      }
-
-      const img = `images/poster_${id}.png`;
-      div.style.backgroundImage = `url('${img}')`;
-
-      div.onclick = () => {
-        document.getElementById("modalImage").src = img;
-        document.getElementById("imageModal").style.display = "flex";
-      };
-
-      if (used) {
-        const stamp = document.createElement("div");
-        stamp.className = "stamp";
-        div.appendChild(stamp);
-        if (secretPosterList.includes(id)) secretCount++;
-        else count++;
-      }
-
-      grid.appendChild(div);
-    });
-
-    // 進捗バー更新
-    function updateProgressBar() {
-      document.getElementById("progressFill").style.width = `${Math.floor((count / posterList.length) * 100)}%`;
-    }
-    updateProgressBar();
-
-    // バナー表示判定
-    const allCollected = posterList.every(id => localStorage.getItem(`gyumax_${id}`));
-    const allPerfect = allCollected && secretPosterList.every(id => localStorage.getItem(`gyumax_${id}`));
-
-    if (allCollected) document.getElementById("completeBanner").style.display = "block";
-    if (allPerfect) document.getElementById("perfectBanner").style.display = "block";
-
-    // UI切り替え関数
-    function toggleUI() {
-      secretUIActive = !secretUIActive;
-
-      if (secretUIActive) {
-        document.body.classList.add("secret-ui");
-        document.body.classList.remove("glitch-mode");
-        document.getElementById("pageTitle").classList.remove("glitch-title");
-      } else {
-        document.body.classList.remove("secret-ui");
-        if (localStorage.getItem("gyumax_J")) {
-          document.body.classList.add("glitch-mode");
-          document.getElementById("pageTitle").classList.add("glitch-title");
-        }
-      }
-
-      // ポスターのグリッチクラス付け替え
-      document.querySelectorAll(".poster").forEach(div => {
-        if (!secretPosterList.includes(div.style.backgroundImage.match(/poster_([A-Z])\.png/)[1])) {
-          if (secretUIActive) {
-            div.classList.remove("glitch-poster");
-          } else {
-            div.classList.add("glitch-poster");
-          }
-        }
-      });
-    }
-
-    // UI切替ボタンの表示制御
-    if (hasSecretAccess) {
-      uiToggleBtn.style.display = "block";
-      uiToggleBtn.onclick = toggleUI;
-    }
-
-  </script>
+  // ゲージ更新
+  const percent = Math.min(100, stamped.length / posters.length * 100);
+  document.getElementById("gauge-bar").style.width = percent + "%";
+</script>
 </body>
 </html>
