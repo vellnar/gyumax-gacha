@@ -2,174 +2,146 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>スタンプラリー進捗</title>
   <style>
     body {
       margin: 0;
-      font-family: sans-serif;
-      background: black;
-      overflow-x: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      transition: background 0.5s;
     }
-    #container {
-      padding: 20px;
-      text-align: center;
+
+    h1 {
       color: white;
+      text-align: center;
+      margin: 20px 0;
+      text-shadow: 0 0 5px #000;
     }
+
+    .poster-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      padding: 10px;
+      max-width: 900px;
+      margin: auto;
+    }
+
     .poster {
-      width: 200px;
-      margin: 10px;
-      display: inline-block;
       position: relative;
-      transition: transform 0.3s ease;
+      cursor: pointer;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: transform 0.3s;
     }
+
     .poster:hover {
       transform: scale(1.05);
-      cursor: pointer;
     }
+
+    .poster img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
     .stamp {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-size: cover;
-      background-repeat: no-repeat;
+      background: url("stamp.png") center/contain no-repeat;
       pointer-events: none;
     }
-    .glow {
-      animation: glow-pulse 2s infinite;
-    }
-    @keyframes glow-pulse {
-      0%, 100% { box-shadow: 0 0 10px #00f, 0 0 20px #00f; }
-      50% { box-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }
-    }
-    #gauge-container {
-      margin-top: 30px;
-      width: 80%;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    #gauge-bar {
-      height: 20px;
-      background: linear-gradient(90deg, #00f, #0ff);
-      width: 0%;
-      transition: width 0.5s ease;
-    }
-    .glass-bg {
-      backdrop-filter: blur(10px);
-      background: rgba(255,255,255,0.05);
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    #lightPulse {
+
+    .toggle-button {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 200vmax;
-      height: 200vmax;
-      background: radial-gradient(circle, rgba(0,123,255,0.2) 0%, transparent 70%);
-      z-index: -1;
-      animation: pulse 3s infinite;
+      top: 10px;
+      right: 10px;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+      font-size: 14px;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
-    }
-    .secret-mode #lightPulse {
-      background: radial-gradient(circle, rgba(0,255,255,0.4) 0%, transparent 70%);
-      animation: pulse-bright 2s infinite;
-    }
-    @keyframes pulse-bright {
-      0%, 100% { opacity: 0.7; }
-      50% { opacity: 1; }
-    }
-    .glass-shards {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: -2;
-    }
-    .shard {
-      position: absolute;
-      width: 10px;
-      height: 30px;
-      background: rgba(0,200,255,0.3);
-      transform: rotate(45deg);
-      animation: floatShard 8s infinite linear;
-    }
-    @keyframes floatShard {
-      0% { transform: translateY(0) rotate(45deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(90deg); opacity: 0; }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 <body>
-<div id="lightPulse"></div>
-<div class="glass-shards" id="shards-container"></div>
-<div id="container" class="glass-bg">
+  <button class="toggle-button" onclick="toggleSecret()">UI切替</button>
   <h1>スタンプラリー進捗</h1>
-  <div id="posterArea"></div>
-  <div id="gauge-container">
-    <div id="gauge-bar"></div>
-  </div>
-</div>
-<script>
-  const posterArea = document.getElementById("posterArea");
-  const posters = ["A","B","C","D","E","F","G","H","I"];
-  const stampPath = "stamp.png"; // スタンプ画像のパス
-  const shardContainer = document.getElementById("shards-container");
+  <div class="poster-container" id="posterContainer"></div>
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const newPoster = urlParams.get("poster");
-  const isSecret = urlParams.get("secret") === "true";
-  let stamped = JSON.parse(localStorage.getItem("stampedPosters")) || [];
-  if (newPoster && posters.includes(newPoster) && !stamped.includes(newPoster)) {
-    stamped.push(newPoster);
-    localStorage.setItem("stampedPosters", JSON.stringify(stamped));
-  }
-  stamped.forEach(id => {
-    const poster = document.createElement("div");
-    poster.className = "poster glow";
-    const img = document.createElement("img");
-    img.src = `posters_${id}.png`;
-    img.style.width = "100%";
-    poster.appendChild(img);
-    const stamp = document.createElement("div");
-    stamp.className = "stamp";
-    stamp.style.backgroundImage = `url(${stampPath})`;
-    poster.appendChild(stamp);
-    posterArea.appendChild(poster);
-  });
+  <script>
+    const secretKey = 'secretMode';
+    const fromSeal = window.location.search.includes('from=seal');
+    const posterContainer = document.getElementById('posterContainer');
+    const posters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 
-  // Jの出現判定（シークレットモード）
-  if (isSecret) {
-    document.body.classList.add("secret-mode");
-    const posterJ = document.createElement("div");
-    posterJ.className = "poster glow";
-    const imgJ = document.createElement("img");
-    imgJ.src = "poster_J.png";
-    imgJ.style.width = "100%";
-    posterJ.appendChild(imgJ);
-    const stampJ = document.createElement("div");
-    stampJ.className = "stamp";
-    stampJ.style.backgroundImage = `url(${stampPath})`;
-    posterJ.appendChild(stampJ);
-    posterArea.appendChild(posterJ);
-  }
+    // sealから来たらsecretModeをONにする
+    if (fromSeal) {
+      localStorage.setItem(secretKey, 'true');
+    }
 
-  // ゲージ更新
-  const percent = Math.min(100, stamped.length / posters.length * 100);
-  document.getElementById("gauge-bar").style.width = percent + "%";
-</script>
+    const isSecret = localStorage.getItem(secretKey) === 'true';
+
+    // 背景設定
+    document.body.style.backgroundImage = isSecret ?
+      "url('secret_bg.png')" : "url('glass_logo.png')";
+
+    // ポスター生成
+    const displayPosters = isSecret ? [...posters, 'J'] : posters;
+
+    displayPosters.forEach(id => {
+      const imgSrc = `poster_${id}.png`;
+      const stampKey = `stamp_${id}`;
+      const isStamped = localStorage.getItem(stampKey) === 'true';
+
+      const div = document.createElement('div');
+      div.className = 'poster';
+      div.innerHTML = `<img src="${imgSrc}" alt="ポスター${id}">`;
+
+      if (isStamped) {
+        const stamp = document.createElement('div');
+        stamp.className = 'stamp';
+        div.appendChild(stamp);
+      }
+
+      div.addEventListener('click', () => {
+        openPoster(imgSrc);
+      });
+
+      posterContainer.appendChild(div);
+    });
+
+    function openPoster(src) {
+      const popup = window.open('', '_blank');
+      popup.document.write(`
+        <html><head><title>拡大表示</title></head>
+        <body style="margin:0; background:#000; display:flex; align-items:center; justify-content:center;">
+          <img src="${src}" style="max-width:100%; max-height:100%;" />
+        </body></html>
+      `);
+    }
+
+    function toggleSecret() {
+      const current = localStorage.getItem(secretKey) === 'true';
+      localStorage.setItem(secretKey, current ? 'false' : 'true');
+      location.reload();
+    }
+  </script>
 </body>
 </html>
