@@ -11,24 +11,29 @@ body {
   text-align: center;
   font-family: 'Yu Gothic', sans-serif;
   background: #f0f0f0;
+  overflow: hidden;
 }
 
 /* ガチャマシン */
 .machine-container {
   position: relative;
-  width: 300px;
-  margin: 50px auto 0 auto;
-}
-#machine {
   width: 100%;
+  max-width: 320px;
+  height: 250px;
+  background: #ccc;
+  margin: 50px auto 0;
+  border-radius: 10px;
 }
 #handle {
   width: 80px;
+  height: 80px;
+  background: #888;
   position: absolute;
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   cursor: pointer;
+  border-radius: 50%;
 }
 
 /* カプセル */
@@ -41,6 +46,9 @@ body {
 }
 #capsule {
   width: 100%;
+  height: 100%;
+  background: red;
+  border-radius: 50%;
   position: absolute;
   top: -100vh; /* 初期は画面外上部 */
 }
@@ -70,6 +78,7 @@ body {
   margin: 20px auto;
   text-align: center;
   box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  position: relative;
 }
 
 /* アニメーション */
@@ -79,24 +88,36 @@ body {
 .spin { animation: spin 1s linear; }
 .shake { animation: shake 1s; }
 .drop { animation: dropBounce 1.5s ease-out forwards; }
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  z-index: 10;
+}
 </style>
 </head>
 <body>
 
+<div class="overlay" id="overlay"></div>
+
 <div class="machine-container">
-  <img src="machine.png" id="machine" alt="ガチャマシン">
-  <img src="handle.png" id="handle" alt="ハンドル">
+  <div id="handle"></div>
 </div>
 
 <div id="capsule-container">
-  <img src="capsule_closed.png" id="capsule" alt="カプセル">
+  <div id="capsule"></div>
   <div id="tapOverlay">タップ！</div>
 </div>
 
 <div id="message"></div>
 
 <script>
-// --- 仮セリフ36個 ---
+// --- 仮セリフ ---
 const loadingTextMap = {
   A: [{key:"A1",text:"セリフ1"},{key:"A2",text:"セリフ2"},{key:"A3",text:"セリフ3"},{key:"A4",text:"セリフ4"}],
   B: [{key:"B1",text:"セリフ5"},{key:"B2",text:"セリフ6"},{key:"B3",text:"セリフ7"},{key:"B4",text:"セリフ8"}],
@@ -110,7 +131,7 @@ const loadingTextMap = {
 };
 
 // --- タイプライター ---
-function typeWriterEffect(element, text, speed = 50){
+function typeWriterEffect(element, text, speed = 60){
   element.textContent = "";
   let i = 0;
   function typing(){
@@ -149,17 +170,13 @@ if(notShown.length === 0){
 // --- 要素取得 ---
 const messageBox = document.getElementById("message");
 const handle = document.getElementById("handle");
-const machine = document.getElementById("machine");
 const capsuleContainer = document.getElementById("capsule-container");
 const capsule = document.getElementById("capsule");
 const tapOverlay = document.getElementById("tapOverlay");
+const overlay = document.getElementById("overlay");
 
 // --- 抽選結果 ---
-const resultStorageKey = `gyumax_result_${id}`;
-let result = localStorage.getItem(resultStorageKey);
-let isAtari;
-if(result){ isAtari = result === "win"; }
-else{ isAtari = Math.random() < 0.3; localStorage.setItem(resultStorageKey,isAtari?"win":"lose"); }
+const isAtari = Math.random() < 0.3;
 const token = [...crypto.getRandomValues(new Uint8Array(16))]
   .map(v=>"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[v%62]).join("");
 sessionStorage.setItem("gyumax_token",token);
@@ -167,7 +184,12 @@ sessionStorage.setItem("gyumax_token",token);
 // --- ハンドルクリック ---
 handle.addEventListener("click",()=>{
   handle.classList.add("spin");
-  machine.classList.add("shake");
+
+  // セリフ表示前に画面を暗くする
+  overlay.style.display = "block";
+  
+  capsuleContainer.style.display = "block";
+  capsule.classList.add("shake");
 
   // 震える1秒後にセリフ表示
   setTimeout(()=>{
@@ -175,17 +197,17 @@ handle.addEventListener("click",()=>{
 
     // セリフが終わるのを目安にカプセル落下
     setTimeout(()=>{
-      capsuleContainer.style.display = "block";
+      overlay.style.display = "none"; // セリフ表示後に明るさを戻す
       capsule.classList.add("drop");
 
       // カプセル落下後にタップ表示
       setTimeout(()=>{
         tapOverlay.style.display = "block";
         tapOverlay.addEventListener("click",()=>{
-          window.location.href = `result.html?id=${id}&result=${isAtari?"win":"lose"}&token=${encodeURIComponent(token)}`;
+          alert(`結果: ${isAtari ? "win" : "lose"}\nトークン: ${token}`);
         });
       },1500); // カプセル落下時間
-    }, selectedMsg.text.length*60 + 200); // タイプライター速度に合わせて遅延
+    }, selectedMsg.text.length * 60 + 200); // タイプライター速度に合わせて遅延
 
   },1000); // ハンドル・マシン演出時間
 });
