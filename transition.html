@@ -79,6 +79,7 @@ body {
   text-align: center;
   box-shadow: 0 0 8px rgba(0,0,0,0.2);
   position: relative;
+  color: #fff; /* 白文字に設定 */
 }
 
 /* アニメーション */
@@ -193,6 +194,7 @@ handle.addEventListener("click",()=>{
 
   // 震える1秒後にセリフ表示
   setTimeout(()=>{
+    // セリフをタイプライター表示
     typeWriterEffect(messageBox, selectedMsg.text, 60);
 
     // セリフが終わるのを目安にカプセル落下
@@ -204,7 +206,9 @@ handle.addEventListener("click",()=>{
       setTimeout(()=>{
         tapOverlay.style.display = "block";
         tapOverlay.addEventListener("click",()=>{
-          alert(`結果: ${isAtari ? "win" : "lose"}\nトークン: ${token}`);
+          // リザルト画面に遷移
+          const nextUrl = `result.html?id=${id}&result=${isAtari ? "win" : "lose"}&token=${encodeURIComponent(token)}`;
+          window.location.href = nextUrl;
         });
       },1500); // カプセル落下時間
     }, selectedMsg.text.length * 60 + 200); // タイプライター速度に合わせて遅延
