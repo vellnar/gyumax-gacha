@@ -1,182 +1,194 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>抽選中...</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 80px 20px;
-      text-align: center;
-      font-family: 'Segoe UI', sans-serif;
-      transition: all 0.5s ease;
-    }
-    .spinner {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      margin: 40px auto;
-      animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
-      box-shadow: 0 0 15px rgba(255,255,255,0.4);
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    .text {
-      font-size: 1.4rem;
-      margin-top: 20px;
-      min-height: 1.5em;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ガチャ抽選</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  font-family: 'Yu Gothic', sans-serif;
+  background: #f0f0f0;
+}
+
+/* ガチャマシン */
+.machine-container {
+  position: relative;
+  width: 300px;
+  margin: 50px auto 0 auto;
+}
+#machine {
+  width: 100%;
+}
+#handle {
+  width: 80px;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+/* カプセル */
+#capsule-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 30px auto;
+  display: none;
+}
+#capsule {
+  width: 100%;
+  position: absolute;
+  top: -100vh; /* 初期は画面外上部 */
+}
+#tapOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+  color: #fff;
+  text-align: center;
+  line-height: 80px;
+  background: rgba(0,0,0,0.5);
+  cursor: pointer;
+  display: none;
+  border-radius: 10px;
+}
+
+/* タイプライター表示 */
+#message {
+  font-size: 20px;
+  background: rgba(255,255,255,0.8);
+  border-radius: 10px;
+  padding: 10px 15px;
+  max-width: 80%;
+  margin: 20px auto;
+  text-align: center;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+/* アニメーション */
+@keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+@keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-10px);} 75%{transform:translateX(10px);} }
+@keyframes dropBounce {0%{top:-100vh;} 70%{top:50%;} 85%{top:40%;} 100%{top:45%;}}
+.spin { animation: spin 1s linear; }
+.shake { animation: shake 1s; }
+.drop { animation: dropBounce 1.5s ease-out forwards; }
+</style>
 </head>
 <body>
-  <div class="spinner"></div>
-  <div class="text" id="loadingText">抽選中...</div>
+
+<div class="machine-container">
+  <img src="machine.png" id="machine" alt="ガチャマシン">
+  <img src="handle.png" id="handle" alt="ハンドル">
+</div>
+
+<div id="capsule-container">
+  <img src="capsule_closed.png" id="capsule" alt="カプセル">
+  <div id="tapOverlay">タップ！</div>
+</div>
+
+<div id="message"></div>
 
 <script>
-(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  let id = urlParams.get("id");
-  if (id) id = id.toUpperCase();
+// --- 仮セリフ36個 ---
+const loadingTextMap = {
+  A: [{key:"A1",text:"セリフ1"},{key:"A2",text:"セリフ2"},{key:"A3",text:"セリフ3"},{key:"A4",text:"セリフ4"}],
+  B: [{key:"B1",text:"セリフ5"},{key:"B2",text:"セリフ6"},{key:"B3",text:"セリフ7"},{key:"B4",text:"セリフ8"}],
+  C: [{key:"C1",text:"セリフ9"},{key:"C2",text:"セリフ10"},{key:"C3",text:"セリフ11"},{key:"C4",text:"セリフ12"}],
+  D: [{key:"D1",text:"セリフ13"},{key:"D2",text:"セリフ14"},{key:"D3",text:"セリフ15"},{key:"D4",text:"セリフ16"}],
+  E: [{key:"E1",text:"セリフ17"},{key:"E2",text:"セリフ18"},{key:"E3",text:"セリフ19"},{key:"E4",text:"セリフ20"}],
+  F: [{key:"F1",text:"セリフ21"},{key:"F2",text:"セリフ22"},{key:"F3",text:"セリフ23"},{key:"F4",text:"セリフ24"}],
+  G: [{key:"G1",text:"セリフ25"},{key:"G2",text:"セリフ26"},{key:"G3",text:"セリフ27"},{key:"G4",text:"セリフ28"}],
+  H: [{key:"H1",text:"セリフ29"},{key:"H2",text:"セリフ30"},{key:"H3",text:"セリフ31"},{key:"H4",text:"セリフ32"}],
+  I: [{key:"I1",text:"セリフ33"},{key:"I2",text:"セリフ34"},{key:"I3",text:"セリフ35"},{key:"I4",text:"セリフ36"}]
+};
 
-  const loadingTextMap = {
-    A: [
-      { key: "A1", text: "奇跡を見たことはあるか？" },
-      { key: "A2", text: "今日は運が味方しているかもしれない。" },
-      { key: "A3", text: "まだ見ぬ奇跡が待っている。" },
-      { key: "A4", text: "目の前の瞬間を大切にしろ。" },
-    ],
-    B: [
-      { key: "B1", text: "大学祭、お楽しみ頂けてますかな？" },
-      { key: "B2", text: "次はもっと熱く盛り上がろう！" },
-      { key: "B3", text: "まだまだ楽しみはこれからだ。" },
-      { key: "B4", text: "笑顔の連鎖を広げよう！" },
-    ],
-    C: [
-      { key: "C1", text: "美術館ではお静かに。何？大学祭？…なら騒ごう！" },
-      { key: "C2", text: "アートの世界と祭りの融合を楽しもう！" },
-      { key: "C3", text: "今日は特別な日だ、思い切り騒げ！" },
-      { key: "C4", text: "感性を解き放て！" },
-    ],
-    D: [
-      { key: "D1", text: "マジテンションブチアゲてこ？" },
-      { key: "D2", text: "今がチャンス、思いっきり楽しもう！" },
-      { key: "D3", text: "勢いそのままに行こうぜ！" },
-      { key: "D4", text: "盛り上がりはこれからが本番！" },
-    ],
-    E: [
-      { key: "E1", text: "時折記憶の中に現れるあの頃の記憶。もう戻れはしない" },
-      { key: "E2", text: "過去を振り返るな、未来へ進め。" },
-      { key: "E3", text: "思い出は胸にしまっておこう。" },
-      { key: "E4", text: "今を生きることが一番大事だ。" },
-    ],
-    F: [
-      { key: "F1", text: "こんなとこにあるポスター、よく見つけたね。" },
-      { key: "F2", text: "探すことが冒険の始まりだ。" },
-      { key: "F3", text: "次はどこに行こうか？" },
-      { key: "F4", text: "歩みを止めずに進め。" },
-    ],
-    G: [
-      { key: "G1", text: "ようこそ。好きなお席に着いてお待ちください。" },
-      { key: "G2", text: "リラックスして楽しもう。" },
-      { key: "G3", text: "準備はいいか？" },
-      { key: "G4", text: "特別な時間が始まる。" },
-    ],
-    H: [
-      { key: "H1", text: "この先へ進む覚悟はあるか？" },
-      { key: "H2", text: "怖がらずに一歩踏み出せ。" },
-      { key: "H3", text: "運命は君の手の中にある。" },
-      { key: "H4", text: "挑戦こそが未来を作る。" },
-    ],
-    I: [
-      { key: "I1", text: "我が恩寵を授けてやろう。" },
-      { key: "I2", text: "選ばれし者の証だ。" },
-      { key: "I3", text: "光を掴む！" },
-      { key: "I4", text: "その手で掴み取れ。" },
-    ]
-  };
-
-  const textEl = document.getElementById("loadingText");
-  if (!id || !loadingTextMap[id]) {
-    window.location.href = "error.html";
-    return;
-  }
-
-  const storageKey = `gyumax_msg_${id}`;
-
-  // 表示済みメッセージID配列をlocalStorageから取得
-  let shownKeys = [];
-  try {
-    shownKeys = JSON.parse(localStorage.getItem(storageKey)) || [];
-  } catch {
-    shownKeys = [];
-  }
-
-  const messages = loadingTextMap[id];
-  // 未表示のメッセージを絞り込み
-  const notShown = messages.filter(m => !shownKeys.includes(m.key));
-
-  let selectedMsg;
-
-  if (notShown.length === 0) {
-    // 全部表示済みならリセットして最初から
-    shownKeys = [];
-    selectedMsg = messages[Math.floor(Math.random() * messages.length)];
-  } else {
-    // 未表示からランダムに選ぶ
-    selectedMsg = notShown[Math.floor(Math.random() * notShown.length)];
-    shownKeys.push(selectedMsg.key);
-    // 保存
-    localStorage.setItem(storageKey, JSON.stringify(shownKeys));
-  }
-
-  // テキストアニメーション
-  function typeText(text, el, delay = 50) {
-    el.textContent = "";
-    [...text].forEach((char, i) => {
-      setTimeout(() => {
-        el.textContent += char;
-      }, i * delay);
-    });
-  }
-
-  typeText(selectedMsg.text, textEl);
-
-  // ここからは抽選処理（表示は固定）
-  const resultStorageKey = `gyumax_result_${id}`;
-  let result = localStorage.getItem(resultStorageKey);
-  let isAtari;
-
-  if (result) {
-    isAtari = result === "win";
-  } else {
-    isAtari = Math.random() < 0.3;
-    localStorage.setItem(resultStorageKey, isAtari ? "win" : "lose");
-  }
-
-  // トークン生成
-  function generateToken(length = 16) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let token = '';
-    for(let i=0; i<length; i++) {
-      token += chars.charAt(Math.floor(Math.random() * chars.length));
+// --- タイプライター ---
+function typeWriterEffect(element, text, speed = 50){
+  element.textContent = "";
+  let i = 0;
+  function typing(){
+    if(i < text.length){
+      element.textContent += text.charAt(i);
+      i++;
+      setTimeout(typing,speed);
     }
-    return token;
   }
-  const token = generateToken();
-  sessionStorage.setItem("gyumax_token", token);
+  typing();
+}
 
-  setTimeout(() => {
-    const resultStr = isAtari ? "win" : "lose";
-    const nextUrl = `result.html?id=${id}&result=${resultStr}&token=${encodeURIComponent(token)}`;
-    window.location.href = nextUrl;
-  }, 3000);
-})();
+// --- URLからID取得 ---
+const urlParams = new URLSearchParams(window.location.search);
+let id = urlParams.get("id")?.toUpperCase();
+if(!id || !loadingTextMap[id]){
+  window.location.href = "error.html";
+}
+
+// --- セリフ抽選 ---
+const storageKey = `gyumax_msg_${id}`;
+let shownKeys = [];
+try{shownKeys = JSON.parse(localStorage.getItem(storageKey))||[];}catch{shownKeys=[];}
+const messages = loadingTextMap[id];
+const notShown = messages.filter(m => !shownKeys.includes(m.key));
+let selectedMsg;
+if(notShown.length === 0){
+  shownKeys = [];
+  selectedMsg = messages[Math.floor(Math.random() * messages.length)];
+}else{
+  selectedMsg = notShown[Math.floor(Math.random() * notShown.length)];
+  shownKeys.push(selectedMsg.key);
+  localStorage.setItem(storageKey,JSON.stringify(shownKeys));
+}
+
+// --- 要素取得 ---
+const messageBox = document.getElementById("message");
+const handle = document.getElementById("handle");
+const machine = document.getElementById("machine");
+const capsuleContainer = document.getElementById("capsule-container");
+const capsule = document.getElementById("capsule");
+const tapOverlay = document.getElementById("tapOverlay");
+
+// --- 抽選結果 ---
+const resultStorageKey = `gyumax_result_${id}`;
+let result = localStorage.getItem(resultStorageKey);
+let isAtari;
+if(result){ isAtari = result === "win"; }
+else{ isAtari = Math.random() < 0.3; localStorage.setItem(resultStorageKey,isAtari?"win":"lose"); }
+const token = [...crypto.getRandomValues(new Uint8Array(16))]
+  .map(v=>"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[v%62]).join("");
+sessionStorage.setItem("gyumax_token",token);
+
+// --- ハンドルクリック ---
+handle.addEventListener("click",()=>{
+  handle.classList.add("spin");
+  machine.classList.add("shake");
+
+  // 震える1秒後にセリフ表示
+  setTimeout(()=>{
+    typeWriterEffect(messageBox, selectedMsg.text, 60);
+
+    // セリフが終わるのを目安にカプセル落下
+    setTimeout(()=>{
+      capsuleContainer.style.display = "block";
+      capsule.classList.add("drop");
+
+      // カプセル落下後にタップ表示
+      setTimeout(()=>{
+        tapOverlay.style.display = "block";
+        tapOverlay.addEventListener("click",()=>{
+          window.location.href = `result.html?id=${id}&result=${isAtari?"win":"lose"}&token=${encodeURIComponent(token)}`;
+        });
+      },1500); // カプセル落下時間
+    }, selectedMsg.text.length*60 + 200); // タイプライター速度に合わせて遅延
+
+  },1000); // ハンドル・マシン演出時間
+});
 </script>
 </body>
 </html>
