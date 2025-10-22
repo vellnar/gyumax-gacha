@@ -68,20 +68,6 @@ body {
   border-radius: 10px;
 }
 
-/* タイプライター表示 */
-#message {
-  font-size: 20px;
-  background: rgba(255,255,255,0.8);
-  border-radius: 10px;
-  padding: 10px 15px;
-  max-width: 80%;
-  margin: 20px auto;
-  text-align: center;
-  box-shadow: 0 0 8px rgba(0,0,0,0.2);
-  position: relative;
-  color: #fff; /* 白文字に設定 */
-}
-
 /* アニメーション */
 @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-10px);} 75%{transform:translateX(10px);} }
@@ -114,8 +100,6 @@ body {
   <div id="capsule"></div>
   <div id="tapOverlay">タップ！</div>
 </div>
-
-<div id="message"></div>
 
 <script>
 // --- 仮セリフ ---
@@ -169,7 +153,6 @@ if(notShown.length === 0){
 }
 
 // --- 要素取得 ---
-const messageBox = document.getElementById("message");
 const handle = document.getElementById("handle");
 const capsuleContainer = document.getElementById("capsule-container");
 const capsule = document.getElementById("capsule");
@@ -183,20 +166,17 @@ const token = [...crypto.getRandomValues(new Uint8Array(16))]
 sessionStorage.setItem("gyumax_token",token);
 
 // --- ハンドルクリック ---
-handle.addEventListener("click",()=>{
+handle.addEventListener("click",()=> {
   handle.classList.add("spin");
 
   // セリフ表示前に画面を暗くする
   overlay.style.display = "block";
-  
+
   capsuleContainer.style.display = "block";
   capsule.classList.add("shake");
 
   // 震える1秒後にセリフ表示
   setTimeout(()=>{
-    // セリフをタイプライター表示
-    typeWriterEffect(messageBox, selectedMsg.text, 60);
-
     // セリフが終わるのを目安にカプセル落下
     setTimeout(()=>{
       overlay.style.display = "none"; // セリフ表示後に明るさを戻す
@@ -205,13 +185,13 @@ handle.addEventListener("click",()=>{
       // カプセル落下後にタップ表示
       setTimeout(()=>{
         tapOverlay.style.display = "block";
-        tapOverlay.addEventListener("click",()=>{
+        tapOverlay.addEventListener("click",()=> {
           // リザルト画面に遷移
           const nextUrl = `result.html?id=${id}&result=${isAtari ? "win" : "lose"}&token=${encodeURIComponent(token)}`;
           window.location.href = nextUrl;
         });
       },1500); // カプセル落下時間
-    }, selectedMsg.text.length * 60 + 200); // タイプライター速度に合わせて遅延
+    }, 200); // タイプライター速度に合わせて遅延
 
   },1000); // ハンドル・マシン演出時間
 });
